@@ -6,9 +6,9 @@
 module abagames.tt.gamemanager;
 
 private import std.math;
-private import opengl;
-private import SDL;
-private import bulletml;
+private import derelict.opengl3.gl;
+private import derelict.sdl2.sdl;
+private import bml = bulletml.bulletml;
 private import abagames.util.vector;
 private import abagames.util.rand;
 private import abagames.util.bulletml.bullet;
@@ -145,7 +145,6 @@ public class GameManager: abagames.util.sdl.gamemanager.GameManager {
     ship.close();
     Shot.close();
     Letter.close();
-    BarrageManager.unload();
   }
 
   public void saveErrorReplay() {
@@ -156,13 +155,13 @@ public class GameManager: abagames.util.sdl.gamemanager.GameManager {
   private void saveLastReplay() {
     try {
       inGameState.saveReplay("last.rpl");
-    } catch (Object o) {}
+    } catch (Throwable o) {}
   }
 
   private void loadLastReplay() {
     try {
       inGameState.loadReplay("last.rpl");
-    } catch (Object o) {
+    } catch (Throwable o) {
       inGameState.resetReplay();
     }
   }
@@ -186,10 +185,12 @@ public class GameManager: abagames.util.sdl.gamemanager.GameManager {
 
   public override void draw() {
     SDL_Event e = mainLoop.event;
-    if (e.type == SDL_VIDEORESIZE) {
-      SDL_ResizeEvent re = e.resize;
-      if (re.w > 150 && re.h > 100)
-        screen.resized(re.w, re.h);
+    if (e.type == SDL_WINDOWEVENT_RESIZED) {
+      SDL_WindowEvent we = e.window;
+      Sint32 w = we.data1;
+      Sint32 h = we.data2;
+      if (w > 150 && h > 100)
+        screen.resized(w, h);
     }
     if (screen.startRenderToLuminousScreen()) {
       glPushMatrix();
@@ -268,13 +269,13 @@ public class InGameState: GameState {
   static const int DEFAULT_TIME = 120000;
   static const int MAX_TIME = 120000;
   static const int SHIP_DESTROYED_PENALTY_TIME = -15000;
-  static const char[] SHIP_DESTROYED_PENALTY_TIME_MSG = "-15 SEC.";
+  static const string SHIP_DESTROYED_PENALTY_TIME_MSG = "-15 SEC.";
   static const int EXTEND_TIME = 15000;
-  static const char[] EXTEND_TIME_MSG = "+15 SEC.";
+  static const string EXTEND_TIME_MSG = "+15 SEC.";
   static const int NEXT_ZONE_ADDITION_TIME = 30000;
-  static const char[] NEXT_ZONE_ADDITION_TIME_MSG = "+30 SEC.";
+  static const string NEXT_ZONE_ADDITION_TIME_MSG = "+30 SEC.";
   static const int NEXT_LEVEL_ADDITION_TIME = 45000;
-  static const char[] NEXT_LEVEL_ADDITION_TIME_MSG = "+45 SEC.";
+  static const string NEXT_LEVEL_ADDITION_TIME_MSG = "+45 SEC.";
   static const int BEEP_START_TIME = 15000;
   Pad pad;
   PrefManager prefManager;
@@ -284,7 +285,7 @@ public class InGameState: GameState {
   int time;
   int nextBeepTime;
   int startBgmCnt;
-  char[] timeChangedMsg;
+  string timeChangedMsg;
   int timeChangedShowCnt;
   int gameOverCnt;
   bool btnPressed;
@@ -497,7 +498,7 @@ public class InGameState: GameState {
     SoundManager.playSe("extend.wav");
   }
 
-  private void changeTime(int ct, char[] msg) {
+  private void changeTime(int ct, string msg) {
     time += ct;
     if (time > MAX_TIME)
       time = MAX_TIME;
@@ -508,11 +509,11 @@ public class InGameState: GameState {
     timeChangedMsg = msg;
   }
 
-  public void saveReplay(char[] fileName) {
+  public void saveReplay(string fileName) {
     _replayData.save(fileName);
   }
 
-  public void loadReplay(char[] fileName) {
+  public void loadReplay(string fileName) {
     _replayData = new ReplayData;
     _replayData.load(fileName);
   }

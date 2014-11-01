@@ -7,8 +7,8 @@ module abagames.tt.bulletactor;
 
 private import std.math;
 private import std.c.stdarg;
-private import opengl;
-private import bulletml;
+private import derelict.opengl3.gl;
+private import bml = bulletml.bulletml;
 private import abagames.util.actor;
 private import abagames.util.vector;
 private import abagames.util.bulletml.bullet;
@@ -60,7 +60,7 @@ public class BulletActor: Actor {
     ppos = new Vector;
   }
 
-  public void set(BulletMLRunner* runner,
+  public void set(bml.BulletMLRunner runner,
                   float x, float y, float deg, float speed) {
     bullet.set(runner, x, y, deg, speed, 0);
     isSimple = false;
@@ -117,9 +117,7 @@ public class BulletActor: Actor {
   public void rewind() {
     bullet.remove();
     bullet.resetParser();
-    BulletMLRunner *runner = BulletMLRunner_new_parser(bullet.getParser());
-    BulletActorPool.registFunctions(runner);
-    bullet.setRunner(runner);
+    bullet.setRunner(bml.createRunner(bullet, bullet.getParser()));
   }
 
   public void remove() {

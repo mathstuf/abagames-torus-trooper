@@ -5,9 +5,10 @@
  */
 module abagames.util.sdl.screen3d;
 
+private import std.conv;
 private import std.string;
-private import SDL;
-private import opengl;
+private import derelict.sdl2.sdl;
+private import derelict.opengl3.gl;
 private import abagames.util.vector;
 private import abagames.util.sdl.screen;
 private import abagames.util.sdl.sdlexception;
@@ -23,28 +24,42 @@ public class Screen3D: Screen {
   static bool windowMode = false;
   static float nearPlane = 0.1;
   static float farPlane = 1000;
+
  private:
+  SDL_Window* _window = null;
 
   protected abstract void init();
   protected abstract void close();
 
   public void initSDL() {
+    // Initialize Derelict.
+    DerelictSDL2.load();
+    DerelictGL.load(); // We use deprecated features.
     // Initialize SDL.
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
       throw new SDLInitFailedException(
-        "Unable to initialize SDL: " ~ std.string.toString(SDL_GetError()));
+        "Unable to initialize SDL: " ~ to!string(SDL_GetError()));
     }
     // Create an OpenGL screen.
     Uint32 videoFlags;
+    int winheight = height;
+    int winwidth = width;
     if (windowMode) {
-      videoFlags = SDL_OPENGL | SDL_RESIZABLE;
+      videoFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
     } else {
-      videoFlags = SDL_OPENGL | SDL_FULLSCREEN;
+      winheight = 0;
+      winwidth = 0;
+      videoFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
-    if (SDL_SetVideoMode(width, height, 0, videoFlags) == null) {
-      throw new SDLInitFailedException
-        ("Unable to create SDL screen: " ~ std.string.toString(SDL_GetError()));
+    _window = SDL_CreateWindow("",
+        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+        winwidth, winheight, videoFlags);
+    if (_window == null) {
+      throw new SDLInitFailedException(
+        ("Unable to create SDL screen: " ~ to!string(SDL_GetError())));
     }
+    SDL_GL_CreateContext(_window);
+    DerelictGL.reload();
     glViewport(0, 0, width, height);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     resized(width, height);
@@ -80,7 +95,7 @@ public class Screen3D: Screen {
 
   public void flip() {
     handleError();
-    SDL_GL_SwapBuffers();
+    SDL_GL_SwapWindow(_window);
   }
 
   public void clear() {
@@ -92,11 +107,11 @@ public class Screen3D: Screen {
     if (error == GL_NO_ERROR)
       return;
     closeSDL();
-    throw new Exception("OpenGL error(" ~ std.string.toString(error) ~ ")");
+    throw new Exception("OpenGL error(" ~ to!string(error) ~ ")");
   }
 
-  protected void setCaption(char[] name) {
-    SDL_WM_SetCaption(std.string.toStringz(name), null);
+  protected void setCaption(string name) {
+    SDL_SetWindowTitle(_window, std.string.toStringz(name));
   }
 
   public static void setColor(float r, float g, float b, float a = 1) {

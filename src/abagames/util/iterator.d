@@ -35,4 +35,4 @@ public class ArrayIterator(T) {
   }
 }
 
-alias ArrayIterator!(char[]) StringIterator;
+alias ArrayIterator!string StringIterator;

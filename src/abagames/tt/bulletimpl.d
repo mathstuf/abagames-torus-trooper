@@ -5,8 +5,10 @@
  */
 module abagames.tt.bulletimpl;
 
-private import bulletml;
+private import std.math;
+private import bml = bulletml.bulletml;
 private import abagames.util.bulletml.bullet;
+private import abagames.util.vector;
 private import abagames.tt.bulletactor;
 private import abagames.tt.bullettarget;
 private import abagames.tt.shape;
@@ -57,10 +59,6 @@ public class BulletImpl: Bullet {
     longRange = bi.longRange;
   }
 
-  public void addParser(BulletMLParser *p, float r, float re, float s) {
-    parserParam ~= new ParserParam(p, r, re, s);
-  }
-
   public bool gotoNextParser() {
     parserIdx++;
     if (parserIdx >= parserParam.length) {
@@ -71,7 +69,20 @@ public class BulletImpl: Bullet {
     }
   }
 
-  public BulletMLParser* getParser() {
+  public double getAimDirection() {
+    Vector b = pos;
+    Vector t = activeTarget;
+    float xrev = xReverse;
+    float yrev = yReverse;
+    float ox = t.x - b.x;
+    if (ox > PI)
+      ox -= PI * 2;
+    else if (ox < -PI)
+      ox += PI * 2;
+    return rtod((atan2(ox, t.y - b.y) * xrev + PI / 2) * yrev - PI / 2);
+  }
+
+  public bml.ResolvedBulletML getParser() {
     return parserParam[parserIdx].parser;
   }
 
@@ -95,12 +106,12 @@ public class BulletImpl: Bullet {
 
 public class ParserParam {
  public:
-  BulletMLParser *parser;
+  bml.ResolvedBulletML parser;
   float rank;
   float rootRankEffect;
   float speed;
 
-  public this(BulletMLParser *p, float r, float re, float s) {
+  public this(bml.ResolvedBulletML p, float r, float re, float s) {
     parser = p;
     rank = r;
     rootRankEffect = re;

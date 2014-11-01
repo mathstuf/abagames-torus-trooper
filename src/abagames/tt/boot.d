@@ -50,10 +50,10 @@ version (Win32_release) {
       _moduleCtor();
       char exe[4096];
       GetModuleFileNameA(null, exe, 4096);
-      char[][1] prog;
+      string[1] prog;
       prog[0] = std.string.toString(exe);
       result = boot(prog ~ std.string.split(std.string.toString(lpCmdLine)));
-    } catch (Object o) {
+    } catch (Throwable o) {
       Logger.error("Exception: " ~ o.toString());
       result = EXIT_FAILURE;
     }
@@ -62,12 +62,12 @@ version (Win32_release) {
   }
 } else {
   // Boot as the general executable.
-  public int main(char[][] args) {
+  public int main(string[] args) {
     return boot(args);
   }
 }
 
-public int boot(char[][] args) {
+public int boot(string[] args) {
   screen = new Screen;
   input = new RecordablePad;
   try {
@@ -83,20 +83,20 @@ public int boot(char[][] args) {
   }
   try {
     mainLoop.loop();
-  } catch (Object o) {
+  } catch (Throwable o) {
     try {
       gameManager.saveErrorReplay();
-    } catch (Object o1) {}
+    } catch (Throwable o1) {}
     throw o;
   }
   return EXIT_SUCCESS;
 }
 
-private void parseArgs(char[][] commandArgs) {
-  char[][] args = readOptionsIniFile();
+private void parseArgs(string[] commandArgs) {
+  string[] args = readOptionsIniFile();
   for (int i = 1; i < commandArgs.length; i++)
     args ~= commandArgs[i];
-  char[] progName = commandArgs[0];
+  string progName = commandArgs[0];
   for (int i = 0; i < args.length; i++) {
     switch (args[i]) {
     case "-brightness":
@@ -105,7 +105,7 @@ private void parseArgs(char[][] commandArgs) {
         throw new Exception("Invalid options");
       }
       i++;
-      float b = cast(float) std.string.atoi(args[i]) / 100;
+      float b = cast(float) atoi(args[i].ptr) / 100;
       if (b < 0 || b > 1) {
         usage(args[0]);
         throw new Exception("Invalid options");
@@ -119,7 +119,7 @@ private void parseArgs(char[][] commandArgs) {
         throw new Exception("Invalid options");
       }
       i++;
-      float l = cast(float) std.string.atoi(args[i]) / 100;
+      float l = cast(float) atoi(args[i].ptr) / 100;
       if (l < 0 || l > 1) {
         usage(progName);
         throw new Exception("Invalid options");
@@ -135,9 +135,9 @@ private void parseArgs(char[][] commandArgs) {
         throw new Exception("Invalid options");
       }
       i++;
-      int w = std.string.atoi(args[i]);
+      int w = atoi(args[i].ptr);
       i++;
-      int h = std.string.atoi(args[i]);
+      int h = atoi(args[i].ptr);
       Screen.width = w;
       Screen.height = h;
       break;
@@ -157,17 +157,17 @@ private void parseArgs(char[][] commandArgs) {
   }
 }
 
-private final const char[] OPTIONS_INI_FILE = "options.ini";
+private const string OPTIONS_INI_FILE = "options.ini";
 
-private char[][] readOptionsIniFile() {
+private string[] readOptionsIniFile() {
   try {
     return Tokenizer.readFile(OPTIONS_INI_FILE, " ");
-  } catch (Object e) {
+  } catch (Throwable e) {
     return null;
   }
 }
 
-private void usage(char[] progName) {
+private void usage(string progName) {
   Logger.error
     ("Usage: " ~ progName ~ " [-brightness [0-100]] [-luminosity [0-100]] [-window] [-res x y] [-nosound]");
 }

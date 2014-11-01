@@ -14,9 +14,9 @@ private import std.string;
 public class Tokenizer {
  private:
 
-  public static char[][] readFile(char[] fileName, char[] separator) {
-    char[][] result;
-    auto File fd = new File;
+  public static string[] readFile(string fileName, string separator) {
+    string[] result;
+    scope File fd = new File;
     fd.open(fileName);
     for (;;) {
       char[] line = fd.readLine();
@@ -26,7 +26,7 @@ public class Tokenizer {
       foreach (char[] s; spl) {
         char[] r = strip(s);
         if (r.length > 0)
-          result ~= r;
+          result ~= r.idup;
       }
     }
     fd.close();
@@ -40,7 +40,7 @@ public class Tokenizer {
 public class CSVTokenizer {
  private:
 
-  public static char[][] readFile(char[] fileName) {
+  public static string[] readFile(string fileName) {
     return Tokenizer.readFile(fileName, ",");
   }
 }

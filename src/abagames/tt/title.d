@@ -6,8 +6,8 @@
 module abagames.tt.title;
 
 private import std.math;
-private import opengl;
-private import openglu;
+private import derelict.opengl3.gl;
+private import gl3n.linalg;
 private import abagames.util.vector;
 private import abagames.util.sdl.displaylist;
 private import abagames.util.sdl.texture;
@@ -193,7 +193,8 @@ public class TitleManager {
     glEnable(GL_BLEND);
     Screen.viewPerspective();
     glPushMatrix();
-    gluLookAt(0, 0, -1, 0, 0, 0, 0, 1, 0);
+    // TODO: Replace
+    //gluLookAt(0, 0, -1, 0, 0, 0, 0, 1, 0);
     glPushMatrix();
     glTranslatef(3 - _replayChangeRatio * 2.4f, 1.8f, 3.5f - _replayChangeRatio * 1.5f);
     glRotatef(30, 1, 0, 0);
@@ -273,7 +274,7 @@ public class TitleManager {
     drawCursorRing(cx, cy, 18 + sin(cnt * 0.1f) * 3);
   }
 
-  private void calcCursorPos(inout float x, inout float y, int gd, int lv) {
+  private void calcCursorPos(ref float x, ref float y, int gd, int lv) {
     x = 460 + gd * 70;
     y = 90;
     if (lv > 1) {

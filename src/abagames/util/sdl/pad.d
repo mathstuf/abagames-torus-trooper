@@ -5,8 +5,9 @@
  */
 module abagames.util.sdl.pad;
 
+private import std.conv;
 private import std.string;
-private import SDL;
+private import derelict.sdl2.sdl;
 private import abagames.util.sdl.input;
 private import abagames.util.sdl.sdlexception;
 
@@ -32,13 +33,13 @@ public class Pad: Input {
   public void openJoystick() {
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0) {
       throw new SDLInitFailedException(
-        "Unable to init SDL joystick: " ~ std.string.toString(SDL_GetError()));
+        "Unable to init SDL joystick: " ~ to!string(SDL_GetError()));
     }
     stick = SDL_JoystickOpen(0);
   }
 
   public void handleEvent(SDL_Event *event) {
-    keys = SDL_GetKeyState(null);
+    keys = SDL_GetKeyboardState(null);
   }
 
   public int getDirState() {
@@ -48,16 +49,16 @@ public class Pad: Input {
       x = SDL_JoystickGetAxis(stick, 0);
       y = SDL_JoystickGetAxis(stick, 1);
     }
-    if (keys[SDLK_RIGHT] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED ||
+    if (keys[SDLK_RIGHT] == SDL_PRESSED || keys[SDLK_KP_6] == SDL_PRESSED ||
         keys[SDLK_d] == SDL_PRESSED || x > JOYSTICK_AXIS)
       dir |= Dir.RIGHT;
-    if (keys[SDLK_LEFT] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED ||
+    if (keys[SDLK_LEFT] == SDL_PRESSED || keys[SDLK_KP_4] == SDL_PRESSED ||
         keys[SDLK_a] == SDL_PRESSED || x < -JOYSTICK_AXIS)
       dir |= Dir.LEFT;
-    if (keys[SDLK_DOWN] == SDL_PRESSED || keys[SDLK_KP2] == SDL_PRESSED ||
+    if (keys[SDLK_DOWN] == SDL_PRESSED || keys[SDLK_KP_2] == SDL_PRESSED ||
         keys[SDLK_s] == SDL_PRESSED || y > JOYSTICK_AXIS)
       dir |= Dir.DOWN;
-    if (keys[SDLK_UP] == SDL_PRESSED ||  keys[SDLK_KP8] == SDL_PRESSED ||
+    if (keys[SDLK_UP] == SDL_PRESSED ||  keys[SDLK_KP_8] == SDL_PRESSED ||
         keys[SDLK_w] == SDL_PRESSED || y < -JOYSTICK_AXIS)
       dir |= Dir.UP;
     lastDirState = dir;

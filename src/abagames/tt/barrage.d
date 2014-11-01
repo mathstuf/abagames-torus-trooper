@@ -9,7 +9,7 @@ private import std.math;
 private import std.string;
 private import std.path;
 private import std.file;
-private import bulletml;
+private import bml = bulletml.bulletml;
 private import abagames.util.rand;
 private import abagames.util.logger;
 private import abagames.tt.bulletactor;
@@ -56,18 +56,18 @@ public class Barrage {
     noXReverse = true;
   }
 
-  public void addBml(BulletMLParser *p, float r, bool re, float s) {
+  public void addBml(bml.ResolvedBulletML p, float r, bool re, float s) {
     parserParam ~= new ParserParam(p, r, re, s);
   }
 
-  public void addBml(char[] bmlDirName, char[] bmlFileName, float r, bool re, float s) {
-    BulletMLParser *p = BarrageManager.getInstance(bmlDirName, bmlFileName);
+  public void addBml(string bmlDirName, string bmlFileName, float r, bool re, float s) {
+    bml.ResolvedBulletML p = BarrageManager.getInstance(bmlDirName, bmlFileName);
     if (!p)
       throw new Error("File not found: " ~ bmlDirName ~ "/" ~ bmlFileName);
     addBml(p, r, re, s);
   }
 
-  public void addBml(char[] bmlDirName, char[] bmlFileName, float r, char[] reStr, float s) {
+  public void addBml(string bmlDirName, string bmlFileName, float r, string reStr, float s) {
     bool re = true;
     if (reStr == "f" || reStr == "false")
       re = false;
@@ -92,45 +92,36 @@ public class Barrage {
  */
 public class BarrageManager {
  private:
-  static BulletMLParserTinyXML *parser[char[]][char[]];
-  static const char[] BARRAGE_DIR_NAME = "barrage";
+  static bml.ResolvedBulletML parser[string][string];
+  static const string BARRAGE_DIR_NAME = "barrage";
 
   public static void load() {
-    char[][] dirs = listdir(BARRAGE_DIR_NAME);
-    foreach (char[] dirName; dirs) {
-      char[][] files = listdir(BARRAGE_DIR_NAME ~ "/" ~ dirName);
-      foreach (char[] fileName; files) {
-        if (getExt(fileName) != "xml")
-          continue;
+    string path = BARRAGE_DIR_NAME;
+    foreach (string dirPath; dirEntries(path, SpanMode.shallow)) {
+      if (!isDir(dirPath)) {
+        continue;
+      }
+      string dirName = baseName(dirPath);
+      foreach (string fileName; dirEntries(dirPath, "*.xml", SpanMode.shallow)) {
         parser[dirName][fileName] = getInstance(dirName, fileName);
       }
     }
   }
 
-  public static BulletMLParserTinyXML* getInstance(char[] dirName, char[] fileName) {
+  public static bml.ResolvedBulletML getInstance(string dirName, string fileName) {
     if (!parser[dirName][fileName]) {
-      char[] barrageName = dirName ~ "/" ~ fileName;
+      string barrageName = dirName ~ "/" ~ fileName;
       Logger.info("Load BulletML: " ~ barrageName);
-      parser[dirName][fileName] =
-        BulletMLParserTinyXML_new(std.string.toStringz(BARRAGE_DIR_NAME ~ "/" ~ barrageName));
-      BulletMLParserTinyXML_parse(parser[dirName][fileName]);
+      parser[dirName][fileName] = bml.resolve(bml.parse(BARRAGE_DIR_NAME ~ "/" ~ barrageName));
     }
     return parser[dirName][fileName];
   }
 
-  public static BulletMLParserTinyXML*[] getInstanceList(char[] dirName) {
-    BulletMLParserTinyXML *pl[];
-    foreach (BulletMLParserTinyXML *p; parser[dirName]) {
+  public static bml.ResolvedBulletML[] getInstanceList(string dirName) {
+    bml.ResolvedBulletML pl[];
+    foreach (bml.ResolvedBulletML p; parser[dirName]) {
       pl ~= p;
     }
     return pl;
-  }
-
-  public static void unload() {
-    foreach (BulletMLParserTinyXML *pa[char[]]; parser) {
-      foreach (BulletMLParserTinyXML *p; pa) {
-        BulletMLParserTinyXML_delete(p);
-      }
-    }
   }
 }

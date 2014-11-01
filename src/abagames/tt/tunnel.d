@@ -5,7 +5,7 @@
  */
 module abagames.tt.tunnel;
 
-private import opengl;
+private import derelict.opengl3.gl;
 private import std.math;
 private import abagames.util.vector;
 private import abagames.util.rand;
@@ -39,10 +39,10 @@ public class Tunnel {
 
   public this() {
     slice = new Slice[DEPTH_NUM];
-    foreach (inout Slice sl; slice)
+    foreach (ref Slice sl; slice)
       sl = new Slice;
     sliceBackward = new Slice[DEPTH_NUM];
-    foreach (inout Slice sl; sliceBackward)
+    foreach (ref Slice sl; sliceBackward)
       sl = new Slice;
     shipPos = new Vector3;
     tpos = new Vector3;
@@ -121,8 +121,8 @@ public class Tunnel {
   }
 
   // Convert args(deg, sliceOffset, sliceIdx, radiusRatio) to a 3D position.
-  public Vector3 getPos(float d, float o, int si, float rr) {
-    int nsi = si + 1;
+  public Vector3 getPos(float d, float o, size_t si, float rr) {
+    size_t nsi = si + 1;
     float r = slice[si].state.rad * (1 - o) + slice[nsi].state.rad * o;
     float d1 = slice[si].d1 * (1 - o) + slice[nsi].d1 * o;
     float d2 = slice[si].d2 * (1 - o) + slice[nsi].d2 * o;
@@ -138,8 +138,8 @@ public class Tunnel {
     return tpos;
   }
 
-  public Vector3 getPosBackward(float d, float o, int si, float rr) {
-    int nsi = si + 1;
+  public Vector3 getPosBackward(float d, float o, size_t si, float rr) {
+    size_t nsi = si + 1;
     float r = sliceBackward[si].state.rad * (1 - o) + sliceBackward[nsi].state.rad * o;
     float d1 = sliceBackward[si].d1 * (1 - o) + sliceBackward[nsi].d1 * o;
     float d2 = sliceBackward[si].d2 * (1 - o) + sliceBackward[nsi].d2 * o;
@@ -156,13 +156,13 @@ public class Tunnel {
   }
 
   // Convert args(deg, sliceOffset, sliceIdx) to a 3D position.
-  public Vector3 getPos(float d, float o, int si) {
+  public Vector3 getPos(float d, float o, size_t si) {
     return getPos(d, o, si, 1.0f);
   }
 
   // Convert a vector(deg, depth) to a 3D position.
   public Vector3 getPos(Vector p) {
-    int si;
+    size_t si;
     float o;
     if (p.y >= -shipIdx - shipOfs) {
       calcIndex(p.y, si, o);
@@ -175,21 +175,21 @@ public class Tunnel {
 
   // Convert a vector(deg, depth, radiusRatio) to a 3D position.
   public Vector3 getPos(Vector3 p) {
-    int si;
+    size_t si;
     float o;
     calcIndex(p.y, si, o);
     return getPos(p.x, o, si, RAD_RATIO - p.z / slice[si].state.rad);
   }
 
   public Vector3 getCenterPos(float y, out float d1, out float d2) {
-    int si;
+    size_t si;
     float o;
     y -= shipY;
     if (y < -getTorusLength() / 2)
       y += getTorusLength();
     if (y >= -shipIdx - shipOfs) {
       calcIndex(y, si, o);
-      int nsi = si + 1;
+      size_t nsi = si + 1;
       d1 = slice[si].d1 * (1 - o) + slice[nsi].d1 * o;
       d2 = slice[si].d2 * (1 - o) + slice[nsi].d2 * o;
       tpos.x = slice[si].centerPos.x * (1 - o) + slice[nsi].centerPos.x * o;
@@ -197,7 +197,7 @@ public class Tunnel {
       tpos.z = slice[si].centerPos.z * (1 - o) + slice[nsi].centerPos.z * o;
     } else {
       calcIndexBackward(y, si, o);
-      int nsi = si + 1;
+      size_t nsi = si + 1;
       d1 = sliceBackward[si].d1 * (1 - o) + sliceBackward[nsi].d1 * o;
       d2 = sliceBackward[si].d2 * (1 - o) + sliceBackward[nsi].d2 * o;
       tpos.x = sliceBackward[si].centerPos.x * (1 - o) + sliceBackward[nsi].centerPos.x * o;
@@ -208,7 +208,7 @@ public class Tunnel {
   }
 
   public Slice getSlice(float y) {
-    int si;
+    size_t si;
     float o;
     if (y >= -shipIdx - shipOfs) {
       calcIndex(y, si, o);
@@ -274,16 +274,16 @@ public class Tunnel {
   }
 
   public float getRadius(float z) {
-    int si;
+    size_t si;
     float o;
     calcIndex(z, si, o);
-    int nsi = si + 1;
+    size_t nsi = si + 1;
     return slice[si].state.rad * (1.0f - o) + slice[nsi].state.rad * o;
   }
 
-  private void calcIndex(in float z, out int idx, out float ofs) {
+  private void calcIndex(in float z, out size_t idx, out float ofs) {
     idx = slice.length + 99999;
-    for (int i = 1; i < slice.length; i++) {
+    for (size_t i = 1; i < slice.length; i++) {
       if (z < slice[i].depth) {
         idx = i - 1;
         ofs = (z - slice[idx].depth) / (slice[idx + 1].depth - slice[idx].depth);
@@ -297,15 +297,15 @@ public class Tunnel {
       idx = slice.length - 2;
       ofs = 0.99;
     }
-    if (ofs !>= 0)
+    if (ofs.isNaN)
       ofs = 0;
     else if (ofs >= 1)
       ofs = 0.99;
   }
 
-  private void calcIndexBackward(in float z, out int idx, out float ofs) {
+  private void calcIndexBackward(in float z, out size_t idx, out float ofs) {
     idx = sliceBackward.length + 99999;
-    for (int i = 1; i < sliceBackward.length; i++) {
+    for (size_t i = 1; i < sliceBackward.length; i++) {
       if (z > sliceBackward[i].depth) {
         idx = i - 1;
         ofs = (sliceBackward[idx].depth - z) / (sliceBackward[idx + 1].depth - sliceBackward[idx].depth);
@@ -319,7 +319,7 @@ public class Tunnel {
       idx = sliceBackward.length - 2;
       ofs = 0.99;
     }
-    if (ofs !>= 0)
+    if (ofs.isNaN)
       ofs = 0;
     else if (ofs >= 1)
       ofs = 0.99;
@@ -359,7 +359,7 @@ public class Tunnel {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     float lineBn = 0.4, polyBn = 0, lightBn = 0.5 - Slice.darkLineRatio * 0.2f;
     slice[slice.length - 1].setPointPos();
-    for (int i = slice.length - 1; i >= 1; i--) {
+    for (size_t i = slice.length - 1; i >= 1; i--) {
       slice[i - 1].setPointPos();
       slice[i].draw(slice[i - 1], lineBn, polyBn, lightBn, this);
       lineBn *= 1.02;
@@ -387,7 +387,7 @@ public class Tunnel {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     float lineBn = 0.4, polyBn = 0, lightBn = 0.5 - Slice.darkLineRatio * 0.2f;
     sliceBackward[sliceBackward.length - 1].setPointPos();
-    for (int i = sliceBackward.length - 1; i >= 1; i--) {
+    for (size_t i = sliceBackward.length - 1; i >= 1; i--) {
       sliceBackward[i - 1].setPointPos();
       sliceBackward[i].draw(sliceBackward[i - 1], lineBn, polyBn, lightBn, this);
       lineBn *= 1.02;
@@ -437,7 +437,7 @@ public class Slice {
     _state = new SliceState;
     _centerPos = new Vector3;
     pointPos = new Vector3[SliceState.MAX_POINT_NUM];
-    foreach (inout Vector3 pp; pointPos)
+    foreach (ref Vector3 pp; pointPos)
       pp = new Vector3;
     radOfs = new Vector3;
     polyPoint = new Vector3;
@@ -632,7 +632,7 @@ public class Torus {
   int _sliceNum;
   TorusPart[] torusPart;
   Rand rand;
-  int tpIdx;
+  size_t tpIdx;
   Ring[] ring;
 
   public this() {
@@ -676,8 +676,8 @@ public class Torus {
         r.close();
   }
 
-  public TorusPart getTorusPart(int idx) {
-    for (int i = 0; i < torusPart.length; i++) {
+  public TorusPart getTorusPart(size_t idx) {
+    for (size_t i = 0; i < torusPart.length; i++) {
       if (torusPart[tpIdx].contains(idx))
         break;
       tpIdx++;
@@ -687,16 +687,16 @@ public class Torus {
     return torusPart[tpIdx];
   }
 
-  public SliceState getSliceState(int idx) {
+  public SliceState getSliceState(size_t idx) {
     TorusPart tp = getTorusPart(idx);
-    int prvTpIdx = tpIdx - 1;
+    size_t prvTpIdx = tpIdx - 1;
     if (prvTpIdx < 0)
       prvTpIdx = torusPart.length - 1;
     SliceState ss = tp.createBlendedSliceState(torusPart[prvTpIdx].sliceState, idx);
     return ss;
   }
 
-  public SliceState getSliceStateWithRing(int idx, int pidx) {
+  public SliceState getSliceStateWithRing(size_t idx, size_t pidx) {
     SliceState ss = getSliceState(idx);
     ss.ring = null;
     foreach (Ring r; ring) {
@@ -779,15 +779,15 @@ public class TorusPart {
     sliceIdxTo = sliceIdx + _sliceNum;
   }
 
-  public bool contains(int idx) {
+  public bool contains(size_t idx) {
     if (idx >= sliceIdxFrom && idx < sliceIdxTo)
       return true;
     else
       return false;
   }
 
-  public SliceState createBlendedSliceState(SliceState blendee, int idx) {
-    int dst = idx - sliceIdxFrom;
+  public SliceState createBlendedSliceState(SliceState blendee, size_t idx) {
+    size_t dst = idx - sliceIdxFrom;
     float blendRatio = cast(float) dst / BLEND_DISTANCE;
     if (blendRatio >= 1)
       return _sliceState;
@@ -929,13 +929,13 @@ public class SliceState {
 public class Ring {
  private:
   static const float[][] COLOR_RGB = [[0.5, 1, 0.9], [1, 0.9, 0.5]];
-  int _idx;
+  size_t _idx;
   DisplayList displayList;
   int cnt;
   int clr;
   int type;
 
-  public this(int idx, SliceState ss, int type = 0) {
+  public this(size_t idx, SliceState ss, int type = 0) {
     _idx = idx;
     cnt = 0;
     this.type = type;
@@ -970,20 +970,20 @@ public class Ring {
     float d = 0, md = 0.2;
     for (int i = 0; i < num; i++) {
       glBegin(GL_LINE_LOOP);
-      auto Vector3 p1 = new Vector3(sin(d) * r * rr1, cos(d) * r * rr1, 0);
-      auto Vector3 p2 = new Vector3(sin(d) * r * rr2, cos(d) * r * rr2, 0);
-      auto Vector3 p3 = new Vector3(sin(d + md) * r * rr2, cos(d + md) * r * rr2, 0);
-      auto Vector3 p4 = new Vector3(sin(d + md) * r * rr1, cos(d + md) * r * rr1, 0);
-      auto Vector3 cp = new Vector3;
+      scope Vector3 p1 = new Vector3(sin(d) * r * rr1, cos(d) * r * rr1, 0);
+      scope Vector3 p2 = new Vector3(sin(d) * r * rr2, cos(d) * r * rr2, 0);
+      scope Vector3 p3 = new Vector3(sin(d + md) * r * rr2, cos(d + md) * r * rr2, 0);
+      scope Vector3 p4 = new Vector3(sin(d + md) * r * rr1, cos(d + md) * r * rr1, 0);
+      scope Vector3 cp = new Vector3;
       cp += p1;
       cp += p2;
       cp += p3;
       cp += p4;
       cp /= 4;
-      auto Vector3 np1 = new Vector3;
-      auto Vector3 np2 = new Vector3;
-      auto Vector3 np3 = new Vector3;
-      auto Vector3 np4 = new Vector3;
+      scope Vector3 np1 = new Vector3;
+      scope Vector3 np2 = new Vector3;
+      scope Vector3 np3 = new Vector3;
+      scope Vector3 np4 = new Vector3;
       np1.blend(p1, cp, 0.7);
       np2.blend(p2, cp, 0.7);
       np3.blend(p3, cp, 0.7);
@@ -1031,7 +1031,7 @@ public class Ring {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   }
 
-  public int idx() {
+  public size_t idx() {
     return _idx;
   }
 }

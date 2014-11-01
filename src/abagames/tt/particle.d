@@ -6,7 +6,7 @@
 module abagames.tt.particle;
 
 private import std.math;
-private import opengl;
+private import derelict.opengl3.gl;
 private import abagames.util.actor;
 private import abagames.util.vector;
 private import abagames.util.rand;

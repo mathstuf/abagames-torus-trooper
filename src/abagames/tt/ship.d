@@ -6,8 +6,8 @@
 module abagames.tt.ship;
 
 private import std.math;
-private import opengl;
-private import openglu;
+private import derelict.opengl3.gl;
+//private import gl3n.linalg;
 private import abagames.util.vector;
 private import abagames.util.rand;
 private import abagames.util.sdl.pad;
@@ -36,8 +36,8 @@ public class Ship: BulletTarget {
     NORMAL, HARD, EXTREME,
   };
   static const int GRADE_NUM = 3;
-  static const char[][] GRADE_LETTER = ["N", "H", "E"];
-  static const char[][] GRADE_STR = ["NORMAL", "HARD", "EXTREME"];
+  static const string[] GRADE_LETTER = ["N", "H", "E"];
+  static const string[] GRADE_STR = ["NORMAL", "HARD", "EXTREME"];
   static bool replayMode, cameraMode, drawFrontMode;
   bool isGameOver;
  private:
@@ -134,7 +134,7 @@ public class Ship: BulletTarget {
     this.gameState = gameState;
   }
 
-  public void start(int grd, int seed) {
+  public void start(int grd, long seed) {
     rand.setSeed(seed);
     grade = grd;
     tunnelOfs = 0;
@@ -461,9 +461,11 @@ public class Ship: BulletTarget {
       ly += my;
       lz += mz;
     }
-    gluLookAt(ex, ey, ez,
-              lx, ly, lz,
-              sin(deg), -cos(deg) , 0);
+    /* TODO: Replace
+     *gluLookAt(ex, ey, ez,
+     *          lx, ly, lz,
+     *          sin(deg), -cos(deg) , 0);
+     */
   }
 
   public void setScreenShake(int cnt, float its) {

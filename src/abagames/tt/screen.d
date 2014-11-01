@@ -6,7 +6,7 @@
 module abagames.tt.screen;
 
 private import std.math;
-private import opengl;
+private import derelict.opengl3.gl;
 private import abagames.util.sdl.screen3d;
 private import abagames.util.sdl.luminous;
 
@@ -16,7 +16,7 @@ private import abagames.util.sdl.luminous;
  */
 public class Screen: Screen3D {
  public:
-  static const char[] CAPTION = "Torus Trooper";
+  static const string CAPTION = "Torus Trooper";
   static float luminous = 0;
  private:
   LuminousScreen luminousScreen;

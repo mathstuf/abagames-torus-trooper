@@ -155,10 +155,10 @@ public class Camera {
     moveCnt--;
     if (moveCnt < 0) {
       moveCnt = 15 + rand.nextInt(15);
-      float lox = fabs(_lookAtPos.x - _cameraPos.x);
-      if (lox > PI)
-        lox = PI * 2 - lox;
-      float ofs = lox * 3 + fabs(_lookAtPos.y - _cameraPos.y);
+      float _lox = fabs(_lookAtPos.x - _cameraPos.x);
+      if (_lox > PI)
+        _lox = PI * 2 - _lox;
+      float ofs = _lox * 3 + fabs(_lookAtPos.y - _cameraPos.y);
       zoomTrg = 3.0f / ofs;
       if (zoomTrg < zoomMin)
         zoomTrg = zoomMin;

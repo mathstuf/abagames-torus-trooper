@@ -5,15 +5,15 @@
  */
 module abagames.util.bulletml.bulletsmanager;
 
-private import bulletml;
+private import bml = bulletml.bulletml;
 private import abagames.util.bulletml.bullet;
 
 /**
  * Interface for bullet's instances manager.
  */
 public interface BulletsManager {
-  public void addBullet(float deg, float speed);
-  public void addBullet(BulletMLState *state, float deg, float speed);
+  public void addBullet(Bullet parent, float deg, float speed);
+  public void addBullet(Bullet parent, const bml.ResolvedBulletML state, float deg, float speed);
   public int getTurn();
   public void killMe(Bullet bullet);
 }

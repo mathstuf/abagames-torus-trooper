@@ -6,7 +6,7 @@
 module abagames.tt.letter;
 
 private import std.math;
-private import opengl;
+private import derelict.opengl3.gl;
 private import abagames.util.sdl.displaylist;
 private import abagames.tt.screen;
 
@@ -94,7 +94,7 @@ public class Letter {
     return idx;
   }
 
-  public static void drawString(char[] str, float lx, float y, float s,
+  public static void drawString(string str, float lx, float y, float s,
                                 int d = Direction.TO_RIGHT, int cl = 0,
                                 bool rev = false, float od = 0) {
     lx += LETTER_WIDTH * s / 2;

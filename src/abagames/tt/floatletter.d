@@ -6,7 +6,7 @@
 module abagames.tt.floatletter;
 
 private import std.math;
-private import opengl;
+private import derelict.opengl3.gl;
 private import abagames.util.actor;
 private import abagames.util.vector;
 private import abagames.util.rand;
@@ -25,7 +25,7 @@ public class FloatLetter: Actor {
   float mx, my;
   float d;
   float size;
-  char[] msg;
+  string msg;
   int cnt;
   float alpha;
 
@@ -42,7 +42,7 @@ public class FloatLetter: Actor {
     pos = new Vector3;
   }
 
-  public void set(char[] m, Vector p, float s, int c = 120) {
+  public void set(string m, Vector p, float s, int c = 120) {
     pos.x = p.x;
     pos.y = p.y;
     pos.z = 1;
