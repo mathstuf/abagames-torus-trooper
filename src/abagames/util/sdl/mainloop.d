@@ -12,6 +12,7 @@ private import abagames.util.prefmanager;
 private import abagames.util.sdl.gamemanager;
 private import abagames.util.sdl.screen;
 private import abagames.util.sdl.input;
+private import abagames.util.sdl.pad;
 private import abagames.util.sdl.sound;
 private import abagames.util.sdl.sdlexception;
 
@@ -50,6 +51,9 @@ public class MainLoop {
     } catch (SDLInitFailedException e) {
       Logger.error(e);
     }
+    try {
+      (cast(Pad) input).openJoystick();
+    } catch (Exception e) {}
     gameManager.init();
   }
 

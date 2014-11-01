@@ -70,9 +70,6 @@ version (Win32_release) {
 public int boot(string[] args) {
   screen = new Screen;
   input = new RecordablePad;
-  try {
-    input.openJoystick();
-  } catch (Exception e) {}
   gameManager = new GameManager;
   prefManager = new PrefManager;
   mainLoop = new MainLoop(screen, input, gameManager, prefManager);
