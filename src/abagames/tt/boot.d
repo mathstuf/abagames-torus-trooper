@@ -61,7 +61,7 @@ public int boot(string[] args) {
 
 private void parseArgs(string[] commandArgs) {
   string[] args = readOptionsIniFile();
-  for (int i = 1; i < commandArgs.length; i++)
+  for (size_t i = 1; i < commandArgs.length; i++)
     args ~= commandArgs[i];
   string progName = commandArgs[0];
   for (int i = 0; i < args.length; i++) {
