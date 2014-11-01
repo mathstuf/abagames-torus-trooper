@@ -98,9 +98,10 @@ public class PadRecord {
 
   public void load(File fd) {
     clear();
-    int l, s, d;
+    size_t l;
+    int s, d;
     fd.read(l);
-    for (int i = 0; i < l; i++) {
+    for (size_t i = 0; i < l; i++) {
       fd.read(s);
       fd.read(d);
       Record r;
