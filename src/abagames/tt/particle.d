@@ -8,7 +8,7 @@ module abagames.tt.particle;
 private import std.math;
 private import derelict.opengl3.gl;
 private import abagames.util.actor;
-private import abagames.util.vector;
+private import gl3n.linalg;
 private import abagames.util.rand;
 private import abagames.util.sdl.luminous;
 private import abagames.tt.tunnel;
@@ -29,11 +29,11 @@ public class Particle: LuminousActor {
   static Rand rand;
   Tunnel tunnel;
   Ship ship;
-  Vector3 pos;
-  Vector3 vel;
-  Vector3 sp, psp;
-  Vector3 rsp, rpsp;  // Mirror point.
-  Vector icp;
+  vec3 pos;
+  vec3 vel;
+  vec3 sp, psp;
+  vec3 rsp, rpsp;  // Mirror point.
+  vec2 icp;
   float r, g, b;
   float lumAlp;
   int cnt;
@@ -53,16 +53,16 @@ public class Particle: LuminousActor {
   public override void init(Object[] args) {
     tunnel = cast(Tunnel) args[0];
     ship = cast(Ship) args[1];
-    pos = new Vector3;
-    vel = new Vector3;
-    sp = new Vector3;
-    psp = new Vector3;
-    rsp = new Vector3;
-    rpsp = new Vector3;
-    icp = new Vector;
+    pos = vec3(0);
+    vel = vec3(0);
+    sp = vec3(0);
+    psp = vec3(0);
+    rsp = vec3(0);
+    rpsp = vec3(0);
+    icp = vec2(0);
   }
 
-  public void set(Vector p, float z, float d, float mz, float speed,
+  public void set(vec2 p, float z, float d, float mz, float speed,
                   float r, float g, float b, int c = 16,
                   int t = PType.SPARK, float w = 0, float h = 0) {
     pos.x = p.x;
@@ -144,7 +144,7 @@ public class Particle: LuminousActor {
   }
 
   private void calcScreenPos() {
-    Vector3 p = tunnel.getPos(pos);
+    vec3 p = tunnel.getPos(pos);
     sp.x = p.x;
     sp.y = p.y;
     sp.z = p.z;

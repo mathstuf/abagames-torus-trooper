@@ -7,8 +7,7 @@ module abagames.tt.ship;
 
 private import std.math;
 private import derelict.opengl3.gl;
-//private import gl3n.linalg;
-private import abagames.util.vector;
+private import gl3n.linalg;
 private import abagames.util.rand;
 private import abagames.util.sdl.pad;
 private import abagames.util.sdl.recordablepad;
@@ -52,14 +51,14 @@ public class Ship: BulletTarget {
   ShotPool shots;
   ParticlePool particles;
   InGameState gameState;
-  Vector _pos;  // Absolute position in the torus.
-  Vector _relPos;  // Relative position in the visual range.
-  Vector _eyePos;
-  Vector rocketPos;
+  vec2 _pos;  // Absolute position in the torus.
+  vec2 _relPos;  // Relative position in the visual range.
+  vec2 _eyePos;
+  vec2 rocketPos;
   float d1, d2;
   int grade;
   float nextStarAppDist;
-  Vector starPos;
+  vec2 starPos;
   int lap;
 
   // Speed and max bank angle change according to the game's grade.
@@ -76,9 +75,9 @@ public class Ship: BulletTarget {
   float bank;
   float bankMax;
   float tunnelOfs;  // Offset from the slice of a tunnel(torus).
-  Vector3 pos3;
+  vec3 pos3;
   ShipShape _shape;
-  Vector3 epos;
+  vec3 epos;
 
   Shot chargingShot;
   static const int FIRE_INTERVAL = 2;
@@ -89,7 +88,7 @@ public class Ship: BulletTarget {
   int fireShotCnt;
   int sideFireCnt;
   int sideFireShotCnt;
-  Vector gunpointPos;
+  vec2 gunpointPos;
 
   int rank;
   int bossAppRank, bossAppNum, zoneEndRank;
@@ -107,16 +106,16 @@ public class Ship: BulletTarget {
     rand = new Rand;
     this.pad = cast(RecordablePad) pad;
     this.tunnel = tunnel;
-    _pos = new Vector;
-    _relPos = new Vector;
-    _eyePos = new Vector;
-    rocketPos = new Vector;
-    starPos = new Vector;
-    pos3 = new Vector3;
-    epos = new Vector3;
+    _pos = vec2(0);
+    _relPos = vec2(0);
+    _eyePos = vec2(0);
+    rocketPos = vec2(0);
+    starPos = vec2(0);
+    pos3 = vec3(0);
+    epos = vec3(0);
     _shape = new ShipShape(1);
     shape.create(ShipShape.Type.SMALL);
-    gunpointPos = new Vector;
+    gunpointPos = vec2(0);
     camera = new Camera(this);
     drawFrontMode = true;
     cameraMode = true;
@@ -236,7 +235,7 @@ public class Ship: BulletTarget {
     tunnel.setShipPos(_relPos.x, tunnelOfs, _pos.y);
     tunnel.setSlices();
     tunnel.setSlicesBackward();
-    Vector3 sp = tunnel.getPos(_relPos);
+    vec3 sp = tunnel.getPos(_relPos);
     pos3.x = sp.x;
     pos3.y = sp.y;
     pos3.z = sp.z;
@@ -404,7 +403,7 @@ public class Ship: BulletTarget {
     }
   }
 
-  public Vector getTargetPos() {
+  public vec2 getTargetPos() {
     return _relPos;
   }
 
@@ -417,7 +416,7 @@ public class Ship: BulletTarget {
       epos.y = -1.1f;
       epos.y += _relPos.y * 0.3f;
       epos.z = 30.0f;
-      Vector3 ep3 = tunnel.getPos(epos);
+      vec3 ep3 = tunnel.getPos(epos);
       ex = ep3.x;
       ey = ep3.y;
       ez = ep3.z;
@@ -425,17 +424,17 @@ public class Ship: BulletTarget {
       epos.y += 6.0f;
       epos.y += _relPos.y * 0.3f;
       epos.z = 0;
-      Vector3 lp3 = tunnel.getPos(epos);
+      vec3 lp3 = tunnel.getPos(epos);
       lx = lp3.x;
       ly = lp3.y;
       lz = lp3.z;
       deg = _eyePos.x;
     } else {
-      Vector3 ep3 = tunnel.getPos(camera.cameraPos);
+      vec3 ep3 = tunnel.getPos(camera.cameraPos);
       ex = ep3.x;
       ey = ep3.y;
       ez = ep3.z;
-      Vector3 lp3 = tunnel.getPos(camera.lookAtPos);
+      vec3 lp3 = tunnel.getPos(camera.lookAtPos);
       lx = lp3.x;
       ly = lp3.y;
       lz = lp3.z;
@@ -461,11 +460,12 @@ public class Ship: BulletTarget {
       ly += my;
       lz += mz;
     }
-    /* TODO: Replace
-     *gluLookAt(ex, ey, ez,
-     *          lx, ly, lz,
-     *          sin(deg), -cos(deg) , 0);
-     */
+    mat4 mat = mat4.look_at(vec3(ex, ey, ez),
+                            vec3(lx, ly, lz),
+                            vec3(sin(deg), -cos(deg), 0));
+    mat.transpose();
+
+    glMultMatrixf(mat.value_ptr);
   }
 
   public void setScreenShake(int cnt, float its) {
@@ -473,7 +473,7 @@ public class Ship: BulletTarget {
     screenShakeIntense = its;
   }
 
-  public bool checkBulletHit(Vector p, Vector pp) {
+  public bool checkBulletHit(vec2 p, vec2 pp) {
     if (cnt <= 0)
       return false;
     float bmvx, bmvy, inaa;
@@ -607,15 +607,15 @@ public class Ship: BulletTarget {
                    Letter.Direction.TO_RIGHT, 0, 6);*/
   }
 
-  public Vector pos() {
+  public vec2 pos() {
     return _pos;
   }
 
-  public Vector relPos() {
+  public vec2 relPos() {
     return _relPos;
   }
 
-  public Vector eyePos() {
+  public vec2 eyePos() {
     return _eyePos;
   }
 

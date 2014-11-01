@@ -9,7 +9,7 @@ private import std.conv;
 private import std.string;
 private import derelict.sdl2.sdl;
 private import derelict.opengl3.gl;
-private import abagames.util.vector;
+private import gl3n.linalg;
 private import abagames.util.sdl.screen;
 private import abagames.util.sdl.sdlexception;
 
@@ -122,11 +122,11 @@ public class Screen3D: Screen {
     glClearColor(r * brightness, g * brightness, b * brightness, a);
   }
 
-  public static void glVertex(Vector3 v) {
+  public static void glVertex(vec3 v) {
     glVertex3f(v.x, v.y, v.z);
   }
 
-  public static void glTranslate(Vector3 v) {
+  public static void glTranslate(vec3 v) {
     glTranslatef(v.x, v.y, v.z);
   }
 }

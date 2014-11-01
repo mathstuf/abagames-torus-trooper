@@ -9,8 +9,8 @@ private import std.conv;
 private import std.math;
 private import std.string;
 private import derelict.opengl3.gl;
+private import gl3n.linalg;
 private import abagames.util.actor;
-private import abagames.util.vector;
 private import abagames.util.rand;
 private import abagames.tt.tunnel;
 private import abagames.tt.shape;
@@ -43,7 +43,7 @@ public class Shot: Actor {
   FloatLetterPool floatLetters;
   ParticlePool particles;
   Ship ship;
-  Vector pos;
+  vec2 pos;
   int chargeCnt, chargeSeCnt;
   int cnt;
   float range;
@@ -79,7 +79,7 @@ public class Shot: Actor {
     floatLetters = cast(FloatLetterPool) args[3];
     particles = cast(ParticlePool) args[4];
     ship = cast(Ship) args[5];
-    pos = new Vector;
+    pos = vec2(0);
     shape = new ResizableDrawable;
   }
 
@@ -109,7 +109,7 @@ public class Shot: Actor {
     exists = true;
   }
 
-  public void update(Vector p) {
+  public void update(vec2 p) {
     pos.x = p.x;
     pos.y = p.y + 0.3;
   }
@@ -168,7 +168,7 @@ public class Shot: Actor {
     cnt++;
   }
 
-  public void addScore(int sc, Vector pos) {
+  public void addScore(int sc, vec2 pos) {
     ship.addScore(sc * multiplier);
     if (multiplier > 1) {
       FloatLetter fl = floatLetters.getInstanceForced();
@@ -192,7 +192,7 @@ public class Shot: Actor {
   }
 
   public override void draw() {
-    Vector3 sp = tunnel.getPos(pos);
+    vec3 sp = tunnel.getPos(pos);
     glPushMatrix();
     Screen.glTranslate(sp);
     glRotatef(deg * 180 / PI, 0, 1, 10);

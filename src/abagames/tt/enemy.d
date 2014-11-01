@@ -8,8 +8,9 @@ module abagames.tt.enemy;
 private import std.math;
 private import derelict.opengl3.gl;
 private import bml = bulletml.bulletml;
-private import abagames.util.vector;
+private import gl3n.linalg;
 private import abagames.util.actor;
+private import abagames.util.math;
 private import abagames.util.rand;
 private import abagames.tt.shape;
 private import abagames.tt.tunnel;
@@ -37,9 +38,9 @@ public class Enemy: Actor {
   Ship ship;
   ParticlePool particles;
   ShipSpec spec;
-  Vector pos;
-  Vector ppos;  // Position of the previous frame.
-  Vector flipMv;
+  vec2 pos;
+  vec2 ppos;  // Position of the previous frame.
+  vec2 flipMv;
   int flipMvCnt;
   float speed;
   float d1, d2;
@@ -53,7 +54,7 @@ public class Enemy: Actor {
   float limitY;  // Boss type enemy has the limit y < limitY.
   BulletActor[] bitBullet; // Actors for bosse's bits.
   int bitCnt;
-  Vector bitOffset;
+  vec2 bitOffset;
   bool passed;
   EnemyPool passedEnemies;
 
@@ -70,10 +71,10 @@ public class Enemy: Actor {
     bullets = cast(BulletActorPool) args[1];
     ship = cast(Ship) args[2];
     particles = cast(ParticlePool) args[3];
-    pos = new Vector;
-    ppos = new Vector;
-    flipMv = new Vector;
-    bitOffset = new Vector;
+    pos = vec2(0);
+    ppos = vec2(0);
+    flipMv = vec2(0);
+    bitOffset = vec2(0);
   }
 
   public void setPassedEnemies(EnemyPool pe) {
@@ -270,7 +271,7 @@ public class Enemy: Actor {
     if (!tunnel.checkInScreen(pos, ship)) {
       topBullet.rootRank = 0;
     } else {
-      if (pos.dist(ship.relPos) > 20 + ship.relPos.y * 10 / Ship.RELPOS_MAX_Y &&
+      if (pos.fastdist(ship.relPos) > 20 + ship.relPos.y * 10 / Ship.RELPOS_MAX_Y &&
           pos.y > ship.relPos.y &&
           flipMvCnt <= 0) {
         if (spec.noFireDepthLimit)
@@ -285,7 +286,7 @@ public class Enemy: Actor {
     }
   }
 
-  public void checkShotHit(Vector p, Collidable shape, Shot shot) {
+  public void checkShotHit(vec2 p, Collidable shape, Shot shot) {
     float ox = fabs(pos.x - p.x), oy = fabs(pos.y - p.y);
     if (ox > PI)
       ox = PI * 2 - ox;
@@ -352,7 +353,7 @@ public class Enemy: Actor {
   }
 
   public override void draw() {
-    Vector3 sp = tunnel.getPos(pos);
+    vec3 sp = tunnel.getPos(pos);
     glPushMatrix();
     Screen.glTranslate(sp);
     glRotatef((pos.x - bank) * 180 / PI, 0, 0, 1);
@@ -388,7 +389,7 @@ public class EnemyPool: ActorPool!(Enemy) {
     super(n, args);
   }
 
-  public void checkShotHit(Vector pos, Collidable shape, Shot shot) {
+  public void checkShotHit(vec2 pos, Collidable shape, Shot shot) {
     foreach (Enemy e; actor)
       if (e.exists)
         e.checkShotHit(pos, shape, shot);

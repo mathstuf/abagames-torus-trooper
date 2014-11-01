@@ -6,7 +6,7 @@
 module abagames.tt.camera;
 
 private import std.math;
-private import abagames.util.vector;
+private import gl3n.linalg;
 private import abagames.util.rand;
 private import abagames.tt.ship;
 private import abagames.tt.screen;
@@ -22,8 +22,8 @@ public class Camera {
   };
   Ship ship;
   Rand rand;
-  Vector3 _cameraPos, cameraTrg, cameraVel;
-  Vector3 _lookAtPos, lookAtOfs;
+  vec3 _cameraPos, cameraTrg, cameraVel;
+  vec3 _lookAtPos, lookAtOfs;
   int lookAtCnt, changeCnt, moveCnt;
   float _deg;
   float _zoom;
@@ -32,11 +32,11 @@ public class Camera {
 
   public this(Ship ship) {
     this.ship = ship;
-    _cameraPos = new Vector3;
-    cameraTrg = new Vector3;
-    cameraVel = new Vector3;
-    _lookAtPos = new Vector3;
-    lookAtOfs = new Vector3;
+    _cameraPos = vec3(0);
+    cameraTrg = vec3(0);
+    cameraVel = vec3(0);
+    _lookAtPos = vec3(0);
+    lookAtOfs = vec3(0);
     _zoom = zoomTrg = 1;
     zoomMin = 0.5f;
     rand = new Rand;
@@ -171,11 +171,11 @@ public class Camera {
       _lookAtPos.x -= PI * 2;
   }
 
-  public Vector3 cameraPos() {
+  public vec3 cameraPos() {
     return _cameraPos;
   }
 
-  public Vector3 lookAtPos() {
+  public vec3 lookAtPos() {
     return _lookAtPos;
   }
 

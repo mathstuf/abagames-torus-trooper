@@ -7,7 +7,8 @@ module abagames.tt.tunnel;
 
 private import derelict.opengl3.gl;
 private import std.math;
-private import abagames.util.vector;
+private import gl3n.linalg;
+private import abagames.util.math;
 private import abagames.util.rand;
 private import abagames.util.sdl.displaylist;
 private import abagames.tt.ship;
@@ -29,8 +30,8 @@ public class Tunnel {
   Slice[] slice;
   float shipDeg, shipOfs, shipY;
   int shipIdx;
-  Vector3 shipPos;
-  Vector3 tpos;
+  vec3 shipPos;
+  vec3 tpos;
   Torus torus;
   int torusIdx;
   float pointFrom;
@@ -44,8 +45,8 @@ public class Tunnel {
     sliceBackward = new Slice[DEPTH_NUM];
     foreach (ref Slice sl; sliceBackward)
       sl = new Slice;
-    shipPos = new Vector3;
-    tpos = new Vector3;
+    shipPos = vec3(0);
+    tpos = vec3(0);
   }
 
   public void start(Torus torus) {
@@ -121,7 +122,7 @@ public class Tunnel {
   }
 
   // Convert args(deg, sliceOffset, sliceIdx, radiusRatio) to a 3D position.
-  public Vector3 getPos(float d, float o, size_t si, float rr) {
+  public vec3 getPos(float d, float o, size_t si, float rr) {
     size_t nsi = si + 1;
     float r = slice[si].state.rad * (1 - o) + slice[nsi].state.rad * o;
     float d1 = slice[si].d1 * (1 - o) + slice[nsi].d1 * o;
@@ -138,7 +139,7 @@ public class Tunnel {
     return tpos;
   }
 
-  public Vector3 getPosBackward(float d, float o, size_t si, float rr) {
+  public vec3 getPosBackward(float d, float o, size_t si, float rr) {
     size_t nsi = si + 1;
     float r = sliceBackward[si].state.rad * (1 - o) + sliceBackward[nsi].state.rad * o;
     float d1 = sliceBackward[si].d1 * (1 - o) + sliceBackward[nsi].d1 * o;
@@ -156,12 +157,12 @@ public class Tunnel {
   }
 
   // Convert args(deg, sliceOffset, sliceIdx) to a 3D position.
-  public Vector3 getPos(float d, float o, size_t si) {
+  public vec3 getPos(float d, float o, size_t si) {
     return getPos(d, o, si, 1.0f);
   }
 
   // Convert a vector(deg, depth) to a 3D position.
-  public Vector3 getPos(Vector p) {
+  public vec3 getPos(vec2 p) {
     size_t si;
     float o;
     if (p.y >= -shipIdx - shipOfs) {
@@ -174,14 +175,14 @@ public class Tunnel {
   }
 
   // Convert a vector(deg, depth, radiusRatio) to a 3D position.
-  public Vector3 getPos(Vector3 p) {
+  public vec3 getPos(vec3 p) {
     size_t si;
     float o;
     calcIndex(p.y, si, o);
     return getPos(p.x, o, si, RAD_RATIO - p.z / slice[si].state.rad);
   }
 
-  public Vector3 getCenterPos(float y, out float d1, out float d2) {
+  public vec3 getCenterPos(float y, out float d1, out float d2) {
     size_t si;
     float o;
     y -= shipY;
@@ -219,7 +220,7 @@ public class Tunnel {
     }
   }
 
-  public float checkInCourse(Vector p) {
+  public float checkInCourse(vec2 p) {
     Slice sl = getSlice(p.y);
     if (sl.isNearlyRound())
       return 0;
@@ -325,11 +326,11 @@ public class Tunnel {
       ofs = 0.99;
   }
 
-  public bool checkInScreen(Vector p, Ship ship) {
+  public bool checkInScreen(vec2 p, Ship ship) {
     return checkInScreen(p, ship, 0.03f, 28);
   }
 
-  private bool checkInScreen(Vector p, Ship ship, float v, float ofs) {
+  private bool checkInScreen(vec2 p, Ship ship, float v, float ofs) {
     float xr = fabs(p.x - ship.eyePos.x);
     if (xr > PI)
       xr = PI * 2 - xr;
@@ -426,21 +427,21 @@ public class Slice {
   SliceState _state;
   float _d1, _d2;
   float _pointFrom;
-  Vector3 _centerPos;
+  vec3 _centerPos;
   float pointRatio;
-  Vector3[] pointPos;
-  Vector3 radOfs;
-  Vector3 polyPoint;
+  vec3[] pointPos;
+  vec3 radOfs;
+  vec3 polyPoint;
   float _depth;
 
   public this() {
     _state = new SliceState;
-    _centerPos = new Vector3;
-    pointPos = new Vector3[SliceState.MAX_POINT_NUM];
-    foreach (ref Vector3 pp; pointPos)
-      pp = new Vector3;
-    radOfs = new Vector3;
-    polyPoint = new Vector3;
+    _centerPos = vec3(0);
+    pointPos = new vec3[SliceState.MAX_POINT_NUM];
+    foreach (ref vec3 pp; pointPos)
+      pp = vec3(0);
+    radOfs = vec3(0);
+    polyPoint = vec3(0);
   }
 
   public void setFirst(float pf, SliceState state, float dpt) {
@@ -539,7 +540,7 @@ public class Slice {
 
   public void setPointPos() {
     float d = 0, md = PI * 2 / (_state.pointNum - 1);
-    foreach (Vector3 pp; pointPos) {
+    foreach (vec3 pp; pointPos) {
       radOfs.x = 0;
       radOfs.y = _state.rad * Tunnel.RAD_RATIO;
       radOfs.z = 0;
@@ -610,7 +611,7 @@ public class Slice {
     return _d2;
   }
 
-  public Vector3 centerPos() {
+  public vec3 centerPos() {
     return _centerPos;
   }
 
@@ -970,20 +971,20 @@ public class Ring {
     float d = 0, md = 0.2;
     for (int i = 0; i < num; i++) {
       glBegin(GL_LINE_LOOP);
-      scope Vector3 p1 = new Vector3(sin(d) * r * rr1, cos(d) * r * rr1, 0);
-      scope Vector3 p2 = new Vector3(sin(d) * r * rr2, cos(d) * r * rr2, 0);
-      scope Vector3 p3 = new Vector3(sin(d + md) * r * rr2, cos(d + md) * r * rr2, 0);
-      scope Vector3 p4 = new Vector3(sin(d + md) * r * rr1, cos(d + md) * r * rr1, 0);
-      scope Vector3 cp = new Vector3;
+      vec3 p1 = vec3(sin(d) * r * rr1, cos(d) * r * rr1, 0);
+      vec3 p2 = vec3(sin(d) * r * rr2, cos(d) * r * rr2, 0);
+      vec3 p3 = vec3(sin(d + md) * r * rr2, cos(d + md) * r * rr2, 0);
+      vec3 p4 = vec3(sin(d + md) * r * rr1, cos(d + md) * r * rr1, 0);
+      vec3 cp = vec3(0);
       cp += p1;
       cp += p2;
       cp += p3;
       cp += p4;
-      cp /= 4;
-      scope Vector3 np1 = new Vector3;
-      scope Vector3 np2 = new Vector3;
-      scope Vector3 np3 = new Vector3;
-      scope Vector3 np4 = new Vector3;
+      cp *= 0.25;
+      vec3 np1 = vec3(0);
+      vec3 np2 = vec3(0);
+      vec3 np3 = vec3(0);
+      vec3 np4 = vec3(0);
       np1.blend(p1, cp, 0.7);
       np2.blend(p2, cp, 0.7);
       np3.blend(p3, cp, 0.7);
@@ -1008,7 +1009,7 @@ public class Ring {
   public void draw(float a, Tunnel tunnel) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     float d1, d2;
-    Vector3 p = tunnel.getCenterPos(_idx, d1 ,d2);
+    vec3 p = tunnel.getCenterPos(_idx, d1 ,d2);
     Screen.setColor(COLOR_RGB[type][0] * a,
                     COLOR_RGB[type][1] * a,
                     COLOR_RGB[type][2] * a);

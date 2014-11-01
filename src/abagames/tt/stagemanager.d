@@ -8,7 +8,7 @@ module abagames.tt.stagemanager;
 private import std.string;
 private import std.math;
 private import bml = bulletml.bulletml;
-private import abagames.util.vector;
+private import gl3n.linalg;
 private import abagames.util.rand;
 private import abagames.tt.enemy;
 private import abagames.tt.barrage;
@@ -474,7 +474,7 @@ public class ShipSpec {
     sp += (aim - sp) * SPEED_CHANGE_RATIO;
   }
 
-  public bool getRangeOfMovement(out float from, out float to, Vector p, Tunnel tunnel) {
+  public bool getRangeOfMovement(out float from, out float to, vec2 p, Tunnel tunnel) {
     float py = p.y;
     Slice cs = tunnel.getSlice(py);
     py += visualRange;
@@ -525,7 +525,7 @@ public class ShipSpec {
     return rand.nextSignedFloat(baseBank);
   }
 
-  public void getBitOffset(Vector ofs, ref float deg, int idx, int cnt) {
+  public void getBitOffset(vec2 ofs, ref float deg, int idx, int cnt) {
     switch (bitType) {
     case BitType.ROUND:
       float od = PI * 2 / bitNum;

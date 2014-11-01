@@ -8,7 +8,7 @@ module abagames.tt.title;
 private import std.math;
 private import derelict.opengl3.gl;
 private import gl3n.linalg;
-private import abagames.util.vector;
+private import abagames.util.math;
 private import abagames.util.sdl.displaylist;
 private import abagames.util.sdl.texture;
 private import abagames.util.sdl.pad;
@@ -193,8 +193,12 @@ public class TitleManager {
     glEnable(GL_BLEND);
     Screen.viewPerspective();
     glPushMatrix();
-    // TODO: Replace
-    //gluLookAt(0, 0, -1, 0, 0, 0, 0, 1, 0);
+    mat4 mat = mat4.look_at(vec3(0, 0, -1),
+                            vec3(0, 0, 0),
+                            vec3(0, 1, 0));
+    mat.transpose();
+
+    glMultMatrixf(mat.value_ptr);
     glPushMatrix();
     glTranslatef(3 - _replayChangeRatio * 2.4f, 1.8f, 3.5f - _replayChangeRatio * 1.5f);
     glRotatef(30, 1, 0, 0);
@@ -293,9 +297,9 @@ public class TitleManager {
   }
 
   private void createTorusShape() {
-    Vector3 cp = new Vector3;
+    vec3 cp = vec3(0);
     cp.z = 0;
-    Vector3 ringOfs = new Vector3;
+    vec3 ringOfs = vec3(0);
     float torusRad = 5;
     float ringRad = 0.7;
     displayList = new DisplayList(3);
@@ -376,7 +380,7 @@ public class TitleManager {
     displayList.endNewList();
   }
 
-  public void createRingOffset(Vector3 ringOfs, Vector3 centerPos,
+  public void createRingOffset(vec3 ringOfs, vec3 centerPos,
                                float rad, float d1, float d2) {
     ringOfs.x = 0;
     ringOfs.y = rad;

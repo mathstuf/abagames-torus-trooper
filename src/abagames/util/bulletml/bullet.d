@@ -7,7 +7,7 @@ module abagames.util.bulletml.bullet;
 
 private import std.math;
 private import bml = bulletml.bulletml;
-private import abagames.util.vector;
+private import gl3n.linalg;
 private import abagames.util.rand;
 private import abagames.util.bulletml.bulletsmanager;
 
@@ -16,8 +16,8 @@ private import abagames.util.bulletml.bulletsmanager;
  */
 public class Bullet: bml.BulletManager {
  public:
-  static Vector activeTarget;
-  Vector pos, acc;
+  static vec2 activeTarget;
+  vec2 pos, acc;
   float deg;
   float speed;
   int id;
@@ -39,13 +39,13 @@ public class Bullet: bml.BulletManager {
 
   public static void setBulletsManager(BulletsManager bm) {
     manager = bm;
-    activeTarget = new Vector;
+    activeTarget = vec2(0);
     activeTarget.x = activeTarget.y = 0;
   }
 
   public this(int id) {
-    pos = new Vector;
-    acc = new Vector;
+    pos = vec2(0);
+    acc = vec2(0);
     this.id = id;
   }
 
@@ -92,8 +92,8 @@ public class Bullet: bml.BulletManager {
   }
 
   public double getAimDirection() {
-    Vector b = pos;
-    Vector t = activeTarget;
+    vec2 b = pos;
+    vec2 t = activeTarget;
     return rtod(std.math.atan2(t.x - b.x, t.y - b.y));
   }
 

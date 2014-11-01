@@ -7,8 +7,8 @@ module abagames.tt.bulletactorpool;
 
 private import std.math;
 private import bml = bulletml.bulletml;
+private import gl3n.linalg;
 private import abagames.util.actor;
-private import abagames.util.vector;
 private import abagames.util.bulletml.bullet;
 private import abagames.util.bulletml.bulletsmanager;
 private import abagames.util.sdl.luminous;
@@ -48,7 +48,7 @@ public class BulletActorPool: ActorPool!(BulletActor), BulletsManager {
     nbi.setParam(cast(BulletImpl) parent);
     if (nbi.gotoNextParser()) {
       bml.BulletMLRunner runner = bml.createRunner(nbi, nbi.getParser());
-      ba.set(runner, Bullet.now.pos.x, Bullet.now.pos.y, deg, speed);
+      ba.set(runner, parent.pos.x, parent.pos.y, deg, speed);
       ba.setMorphSeed();
     } else {
       ba.set(parent.pos.x, parent.pos.y, deg, speed * ba.bullet.getSpeedRank());
@@ -135,7 +135,7 @@ public class BulletActorPool: ActorPool!(BulletActor), BulletsManager {
         ba.startDisappear();
   }
 
-  public void checkShotHit(Vector pos, Collidable shape, Shot shot) {
+  public void checkShotHit(vec2 pos, Collidable shape, Shot shot) {
     foreach (BulletActor ba; actor)
       if (ba.exists)
         ba.checkShotHit(pos, shape, shot);

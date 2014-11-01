@@ -5,26 +5,26 @@
  */
 module abagames.tt.bullettarget;
 
-private import abagames.util.vector;
+private import gl3n.linalg;
 
 /**
  * Target that is aimed by bullets.
  */
 public interface BulletTarget {
  public:
-  Vector getTargetPos();
+  vec2 getTargetPos();
 }
 
 public class VirtualBulletTarget: BulletTarget {
  public:
-  Vector pos;
+  vec2 pos;
  private:
 
   public this() {
-    pos = new Vector;
+    pos = vec2(0);
   }
 
-  public Vector getTargetPos() {
+  public vec2 getTargetPos() {
     return pos;
   }
 }

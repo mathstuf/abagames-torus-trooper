@@ -7,8 +7,8 @@ module abagames.tt.floatletter;
 
 private import std.math;
 private import derelict.opengl3.gl;
+private import gl3n.linalg;
 private import abagames.util.actor;
-private import abagames.util.vector;
 private import abagames.util.rand;
 private import abagames.tt.letter;
 private import abagames.tt.tunnel;
@@ -21,7 +21,7 @@ public class FloatLetter: Actor {
  private:
   static Rand rand;
   Tunnel tunnel;
-  Vector3 pos;
+  vec3 pos;
   float mx, my;
   float d;
   float size;
@@ -39,10 +39,10 @@ public class FloatLetter: Actor {
 
   public override void init(Object[] args) {
     tunnel = cast(Tunnel) args[0];
-    pos = new Vector3;
+    pos = vec3(0);
   }
 
-  public void set(string m, Vector p, float s, int c = 120) {
+  public void set(string m, vec2 p, float s, int c = 120) {
     pos.x = p.x;
     pos.y = p.y;
     pos.z = 1;
@@ -69,7 +69,7 @@ public class FloatLetter: Actor {
 
   public override void draw() {
     glPushMatrix();
-    Vector3 sp = tunnel.getPos(pos);
+    vec3 sp = tunnel.getPos(pos);
     glTranslatef(0, 0, sp.z);
     Screen.setColor(1, 1, 1, 1);
     Letter.drawString(msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 2, false, d  * 180 / PI);

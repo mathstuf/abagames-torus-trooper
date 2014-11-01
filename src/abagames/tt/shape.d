@@ -8,7 +8,8 @@ module abagames.tt.shape;
 private import std.string;
 private import std.math;
 private import derelict.opengl3.gl;
-private import abagames.util.vector;
+private import gl3n.linalg;
+private import abagames.util.math;
 private import abagames.util.rand;
 private import abagames.util.sdl.screen3d;
 private import abagames.util.sdl.displaylist;
@@ -26,7 +27,7 @@ public interface Drawable {
  * Interface and implmentation for shape that has a collision.
  */
 public interface Collidable {
-  public Vector collision();
+  public vec2 collision();
   public bool checkCollision(float ax, float ay, Collidable shape = null, float speed = 1);
 }
 
@@ -60,10 +61,10 @@ public class ShipShape: Collidable, Drawable {
  private:
   static Rand rand;
   Structure[] structure;
-  Vector _collision;
+  vec2 _collision;
   DisplayList displayList;
   float[] rocketX;
-  Vector rocketPos, fragmentPos;
+  vec2 rocketPos, fragmentPos;
   int color;
 
   static this() {
@@ -95,8 +96,8 @@ public class ShipShape: Collidable, Drawable {
       break;
     }
     createDisplayList();
-    rocketPos = new Vector;
-    fragmentPos = new Vector;
+    rocketPos = vec2(0);
+    fragmentPos = vec2(0);
   }
 
   private void createDisplayList() {
@@ -109,7 +110,7 @@ public class ShipShape: Collidable, Drawable {
   }
 
   private void createSmallType(bool damaged = false) {
-    _collision = new Vector;
+    _collision = vec2(0);
     int shaftNum = 1 + rand.nextInt(2);
     float sx = 0.25 + rand.nextFloat(0.1);
     float so = 0.5 + rand.nextFloat(0.3);
@@ -145,7 +146,7 @@ public class ShipShape: Collidable, Drawable {
   }
 
   private void createMiddleType(bool damaged = false) {
-    _collision = new Vector;
+    _collision = vec2(0);
     int shaftNum = 3 + rand.nextInt(2);
     float sx = 1.0 + rand.nextFloat(0.7);
     float so = 0.9 + rand.nextFloat(0.6);
@@ -190,7 +191,7 @@ public class ShipShape: Collidable, Drawable {
   }
 
   private void createLargeType(bool damaged = false) {
-    _collision = new Vector;
+    _collision = vec2(0);
     int shaftNum = 5 + rand.nextInt(2);
     float sx = 3.0 + rand.nextFloat(2.2);
     float so = 1.5 + rand.nextFloat(1.0);
@@ -291,7 +292,7 @@ public class ShipShape: Collidable, Drawable {
   }
 
   // Add particles from rockets.
-  public void addParticles(Vector pos, ParticlePool particles) {
+  public void addParticles(vec2 pos, ParticlePool particles) {
     foreach (float rx; rocketX) {
       Particle pt = particles.getInstance();
       if (!pt)
@@ -303,7 +304,7 @@ public class ShipShape: Collidable, Drawable {
   }
 
   // Add fragments when an enemy is destoyed.
-  public void addFragments(Vector pos, ParticlePool particles) {
+  public void addFragments(vec2 pos, ParticlePool particles) {
     if (collision.x < 0.5)
       return;
     for (int i = 0; i < collision.x * 40; i++) {
@@ -328,7 +329,7 @@ public class ShipShape: Collidable, Drawable {
     displayList.call(0);
   }
 
-  public Vector collision() {
+  public vec2 collision() {
     return _collision;
   }
 }
@@ -348,7 +349,7 @@ public class Structure {
     [0.7, 0.5, 0.7],
     [0.5, 0.7, 0.7],
   ];
-  Vector pos;
+  vec2 pos;
   float d1, d2;
   static enum Shape {
     SQUARE, WING, TRIANGLE, ROCKET,
@@ -361,7 +362,7 @@ public class Structure {
  private:
 
   public this() {
-    pos = new Vector;
+    pos = vec2(0);
   }
 
   public void createDisplayList() {
@@ -584,13 +585,13 @@ public class BulletShape: Drawable {
   }
 
   private void createTriangleShape(bool wireShape) {
-    scope Vector3 cp = new Vector3;
-    scope Vector3 p1 = new Vector3;
-    scope Vector3 p2 = new Vector3;
-    scope Vector3 p3 = new Vector3;
-    scope Vector3 np1 = new Vector3;
-    scope Vector3 np2 = new Vector3;
-    scope Vector3 np3 = new Vector3;
+    vec3 cp = vec3(0);
+    vec3 p1 = vec3(0);
+    vec3 p2 = vec3(0);
+    vec3 p3 = vec3(0);
+    vec3 np1 = vec3(0);
+    vec3 np2 = vec3(0);
+    vec3 np3 = vec3(0);
     for (int i = 0; i < 3; i++) {
       float d = PI * 2 / 3 * i;
       p1.x = p1.y = 0;
@@ -605,7 +606,7 @@ public class BulletShape: Drawable {
       cp += p1;
       cp += p2;
       cp += p3;
-      cp /= 3;
+      cp *= 0.3333f;
       np1.blend(p1, cp, 0.6);
       np2.blend(p2, cp, 0.6);
       np3.blend(p3, cp, 0.6);
@@ -631,9 +632,9 @@ public class BulletShape: Drawable {
   }
 
   private void createSquareShape(bool wireShape) {
-    scope Vector3 cp = new Vector3;
-    scope Vector3[] p = new Vector3[4];
-    scope Vector3[] np = new Vector3[4];
+    vec3 cp = vec3(0);
+    scope vec3[] p = new vec3[4];
+    scope vec3[] np = new vec3[4];
     static const float[][][] POINT_DAT = [
       [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1], ],
       [[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1], ],
@@ -642,10 +643,10 @@ public class BulletShape: Drawable {
       [[1, -1, -1], [1, -1, 1], [1, 1, 1], [1, 1, -1], ],
       [[-1, -1, -1], [-1, -1, 1], [-1, 1, 1], [-1, 1, -1], ],
     ];
-    foreach (ref Vector3 ip; p)
-      ip = new Vector3;
-    foreach (ref Vector3 inp; np)
-      inp = new Vector3;
+    foreach (ref vec3 ip; p)
+      ip = vec3(0);
+    foreach (ref vec3 inp; np)
+      inp = vec3(0);
     for (int i = 0; i < 6; i++) {
       cp.x = cp.y = cp.z = 0;
       for (int j = 0; j < 4; j++) {
@@ -654,7 +655,7 @@ public class BulletShape: Drawable {
         p[j].z = POINT_DAT[i][j][2];
         cp += p[j];
       }
-      cp /= 4;
+      cp *= 0.25;
       for (int j = 0; j < 4; j++)
         np[j].blend(p[j], cp, 0.6);
       if (!wireShape)
@@ -676,9 +677,9 @@ public class BulletShape: Drawable {
   }
 
   private void createBarShape(bool wireShape) {
-    scope Vector3 cp = new Vector3;
-    scope Vector3[] p = new Vector3[4];
-    scope Vector3[] np = new Vector3[4];
+    vec3 cp = vec3(0);
+    scope vec3[] p = new vec3[4];
+    scope vec3[] np = new vec3[4];
     static const float[][][] POINT_DAT = [
       [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1], ],
       //[[-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1], ],
@@ -687,10 +688,10 @@ public class BulletShape: Drawable {
       [[1, -1, -1], [1, -1, 1], [1, 1, 1], [1, 1, -1], ],
       [[-1, -1, -1], [-1, -1, 1], [-1, 1, 1], [-1, 1, -1], ],
     ];
-    foreach (ref Vector3 ip; p)
-      ip = new Vector3;
-    foreach (ref Vector3 inp; np)
-      inp = new Vector3;
+    foreach (ref vec3 ip; p)
+      ip = vec3(0);
+    foreach (ref vec3 inp; np)
+      inp = vec3(0);
     for (int i = 0; i < 5; i++) {
       cp.x = cp.y = cp.z = 0;
       for (int j = 0; j < 4; j++) {
@@ -699,7 +700,7 @@ public class BulletShape: Drawable {
         p[j].z = POINT_DAT[i][j][2] * 1.75f;
         cp += p[j];
       }
-      cp /= 4;
+      cp *= 0.25;
       for (int j = 0; j < 4; j++)
         np[j].blend(p[j], cp, 0.6);
       if (!wireShape)
@@ -733,7 +734,7 @@ public class ShotShape: Collidable, Drawable {
  private:
   static const float[] COLOR_RGB = [0.8, 1, 0.7];
   DisplayList displayList;
-  Vector _collision;
+  vec2 _collision;
 
   public void create(bool charge) {
     displayList = new DisplayList(1);
@@ -774,7 +775,7 @@ public class ShotShape: Collidable, Drawable {
       }
     }
     displayList.endNewList();
-    _collision = new Vector(0.15, 0.3);
+    _collision = vec2(0.15, 0.3);
   }
 
   public void close() {
@@ -785,7 +786,7 @@ public class ShotShape: Collidable, Drawable {
     displayList.call(0);
   }
 
-  public Vector collision() {
+  public vec2 collision() {
     return _collision;
   }
 }
@@ -798,7 +799,7 @@ public class ResizableDrawable: Collidable, Drawable {
  private:
   Drawable _shape;
   float _size;
-  Vector _collision;
+  vec2 _collision;
 
   public void draw() {
     glScalef(_size, _size, _size);
@@ -806,7 +807,7 @@ public class ResizableDrawable: Collidable, Drawable {
   }
 
   public Drawable shape(Drawable v) {
-    _collision = new Vector;
+    _collision = vec2(0);
     return _shape = v;
   }
 
@@ -814,14 +815,14 @@ public class ResizableDrawable: Collidable, Drawable {
     return _size = v;
   }
 
-  public Vector collision() {
+  public vec2 collision() {
     Collidable cd = cast(Collidable) _shape;
     if (cd) {
       _collision.x = cd.collision.x * _size;
       _collision.y = cd.collision.y * _size;
       return _collision;
     } else {
-      return null;
+      return vec2(0);
     }
   }
 }

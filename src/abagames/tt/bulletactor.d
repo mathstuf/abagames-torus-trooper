@@ -9,8 +9,8 @@ private import std.math;
 private import std.c.stdarg;
 private import derelict.opengl3.gl;
 private import bml = bulletml.bulletml;
+private import gl3n.linalg;
 private import abagames.util.actor;
-private import abagames.util.vector;
 private import abagames.util.bulletml.bullet;
 private import abagames.tt.bulletimpl;
 private import abagames.tt.bullettarget;
@@ -35,7 +35,7 @@ public class BulletActor: Actor {
   static int nextId = 0;
   Tunnel tunnel;
   Ship ship;
-  Vector ppos;
+  vec2 ppos;
   int cnt;
   bool isSimple;
   bool isTop;
@@ -57,7 +57,7 @@ public class BulletActor: Actor {
     ship = cast(Ship) args[1];
     bullet = new BulletImpl(nextId);
     nextId++;
-    ppos = new Vector;
+    ppos = vec2(0);
   }
 
   public void set(bml.BulletMLRunner runner,
@@ -136,9 +136,9 @@ public class BulletActor: Actor {
   }
 
   public override void move() {
-    Vector tpos = bullet.target.getTargetPos();
-    Bullet.target.x = tpos.x;
-    Bullet.target.y = tpos.y;
+    vec2 tpos = bullet.target.getTargetPos();
+    Bullet.activeTarget.x = tpos.x;
+    Bullet.activeTarget.y = tpos.y;
     ppos.x = bullet.pos.x;
     ppos.y = bullet.pos.y;
     if (isAimTop) {
@@ -210,7 +210,7 @@ public class BulletActor: Actor {
     }
   }
 
-  public void checkShotHit(Vector p, Collidable shape, Shot shot) {
+  public void checkShotHit(vec2 p, Collidable shape, Shot shot) {
     if (!isVisible || disapCnt > 0)
       return;
     float ox = fabs(bullet.pos.x - p.x), oy = fabs(bullet.pos.y - p.y);
@@ -228,7 +228,7 @@ public class BulletActor: Actor {
     if (!isVisible)
       return;
     float d = (bullet.deg * bullet.xReverse + PI / 2) * bullet.yReverse - PI / 2;
-    Vector3 sp = tunnel.getPos(bullet.pos);
+    vec3 sp = tunnel.getPos(bullet.pos);
     glPushMatrix();
     glTranslatef(sp.x, sp.y, sp.z);
     glRotatef(d * 180 / PI, 0, 1, 0);
