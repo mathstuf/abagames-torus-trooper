@@ -79,14 +79,18 @@ public int boot(string[] args) {
   try {
     parseArgs(args);
   } catch (Exception e) {
+    Logger.info(e.toString());
     return EXIT_FAILURE;
   }
   try {
     mainLoop.loop();
   } catch (Throwable o) {
+    Logger.info(o.toString());
     try {
       gameManager.saveErrorReplay();
-    } catch (Throwable o1) {}
+    } catch (Throwable o1) {
+      Logger.info(o1.toString());
+    }
     throw o;
   }
   return EXIT_SUCCESS;
