@@ -102,7 +102,8 @@ public class BarrageManager {
         continue;
       }
       string dirName = baseName(dirPath);
-      foreach (string fileName; dirEntries(dirPath, "*.xml", SpanMode.shallow)) {
+      foreach (string filePath; dirEntries(dirPath, "*.xml", SpanMode.shallow)) {
+        string fileName = baseName(filePath);
         parser[dirName][fileName] = getInstance(dirName, fileName);
       }
     }
