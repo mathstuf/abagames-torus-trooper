@@ -110,11 +110,9 @@ public class BarrageManager {
   }
 
   public static bml.ResolvedBulletML getInstance(string dirName, string fileName) {
-    if (!parser[dirName][fileName]) {
-      string barrageName = dirName ~ "/" ~ fileName;
-      Logger.info("Load BulletML: " ~ barrageName);
-      parser[dirName][fileName] = bml.resolve(bml.parse(BARRAGE_DIR_NAME ~ "/" ~ barrageName));
-    }
+    string barrageName = dirName ~ "/" ~ fileName;
+    Logger.info("Load BulletML: " ~ barrageName);
+    parser[dirName][fileName] = bml.resolve(bml.parse(BARRAGE_DIR_NAME ~ "/" ~ barrageName));
     return parser[dirName][fileName];
   }
 
