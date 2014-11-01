@@ -48,7 +48,7 @@ public class Pad: Input {
       x = SDL_JoystickGetAxis(stick, 0);
       y = SDL_JoystickGetAxis(stick, 1);
     }
-    if (keys[SDLK_RIGHT] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED || 
+    if (keys[SDLK_RIGHT] == SDL_PRESSED || keys[SDLK_KP6] == SDL_PRESSED ||
         keys[SDLK_d] == SDL_PRESSED || x > JOYSTICK_AXIS)
       dir |= Dir.RIGHT;
     if (keys[SDLK_LEFT] == SDL_PRESSED || keys[SDLK_KP4] == SDL_PRESSED ||
@@ -78,7 +78,7 @@ public class Pad: Input {
       btn8 = SDL_JoystickGetButton(stick, 7);
     }
     if (keys[SDLK_z] == SDL_PRESSED || keys[SDLK_PERIOD] == SDL_PRESSED ||
-        keys[SDLK_LCTRL] == SDL_PRESSED || 
+        keys[SDLK_LCTRL] == SDL_PRESSED ||
         btn1 || btn4 || btn5 || btn8) {
       if (!buttonReversed)
         btn |= Button.A;

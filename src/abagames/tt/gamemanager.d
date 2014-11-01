@@ -247,7 +247,7 @@ public class GameState {
   public abstract void drawLuminous();
   public abstract void drawFront();
 
-  
+
   public float level(float v) {
     return _level = v;
   }

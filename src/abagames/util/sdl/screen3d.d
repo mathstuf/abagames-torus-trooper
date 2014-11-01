@@ -40,7 +40,7 @@ public class Screen3D: Screen {
       videoFlags = SDL_OPENGL | SDL_RESIZABLE;
     } else {
       videoFlags = SDL_OPENGL | SDL_FULLSCREEN;
-    } 
+    }
     if (SDL_SetVideoMode(width, height, 0, videoFlags) == null) {
       throw new SDLInitFailedException
         ("Unable to create SDL screen: " ~ std.string.toString(SDL_GetError()));
@@ -60,9 +60,9 @@ public class Screen3D: Screen {
     glLoadIdentity();
     //gluPerspective(45.0f, cast(GLfloat) width / cast(GLfloat) height, nearPlane, farPlane);
     glFrustum(-nearPlane,
-	      nearPlane,
-	      -nearPlane * cast(GLfloat) height / cast(GLfloat) width,
-	      nearPlane * cast(GLfloat) height / cast(GLfloat) width,
+              nearPlane,
+              -nearPlane * cast(GLfloat) height / cast(GLfloat) width,
+              nearPlane * cast(GLfloat) height / cast(GLfloat) width,
               0.1f, farPlane);
     glMatrixMode(GL_MODELVIEW);
   }

@@ -69,7 +69,7 @@ public class ShipShape: Collidable, Drawable {
   static this() {
     rand = new Rand;
   }
-  
+
   public this(long randSeed) {
     rand.setSeed(randSeed);
   }
@@ -809,7 +809,7 @@ public class ResizableDrawable: Collidable, Drawable {
     _collision = new Vector;
     return _shape = v;
   }
-  
+
   public float size(float v) {
     return _size = v;
   }

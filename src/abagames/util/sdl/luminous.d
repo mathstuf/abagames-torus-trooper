@@ -36,7 +36,7 @@ public class LuminousScreen {
     glGenTextures(1, &luminousTexture);
     glBindTexture(GL_TEXTURE_2D, luminousTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, 4, luminousTextureWidth, luminousTextureHeight, 0,
-		 GL_RGBA, GL_UNSIGNED_BYTE, data);
+                 GL_RGBA, GL_UNSIGNED_BYTE, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   }
@@ -56,8 +56,8 @@ public class LuminousScreen {
 
   public void endRender() {
     glBindTexture(GL_TEXTURE_2D, luminousTexture);
-    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 
-		     0, 0, luminousTextureWidth, luminousTextureHeight, 0);
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+                     0, 0, luminousTextureWidth, luminousTextureHeight, 0);
     glViewport(0, 0, screenWidth, screenHeight);
   }
 

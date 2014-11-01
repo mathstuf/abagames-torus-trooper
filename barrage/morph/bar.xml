@@ -5,21 +5,21 @@
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 
 <action label="top">
-	<fire>
-		<direction type="relative">0</direction>
-		<speed type="relative">0</speed>
-		<bullet/>
-	</fire>
-	<repeat><times>$rank*1.7</times>
-	<action>
-		<fire>
-			<direction type="relative">0</direction>
-			<speed type="sequence">0.08+$rank*0.05</speed>
-			<bullet/>
-		</fire>
-	</action>
-	</repeat>
-	<vanish/>
+ <fire>
+  <direction type="relative">0</direction>
+  <speed type="relative">0</speed>
+  <bullet/>
+ </fire>
+ <repeat><times>$rank*1.7</times>
+ <action>
+  <fire>
+   <direction type="relative">0</direction>
+   <speed type="sequence">0.08+$rank*0.05</speed>
+   <bullet/>
+  </fire>
+ </action>
+ </repeat>
+ <vanish/>
 </action>
 
 </bulletml>

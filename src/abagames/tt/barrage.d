@@ -81,9 +81,9 @@ public class Barrage {
     else
       xReverse = rand.nextInt(2) * 2 - 1;
     return bullets.addTopBullet(parserParam,
-				0, 0, PI, 0,
-				shape, disapShape, xReverse, 1, longRange, target,
-				prevWait, postWait);
+                                0, 0, PI, 0,
+                                shape, disapShape, xReverse, 1, longRange, target,
+                                prevWait, postWait);
   }
 }
 
@@ -111,7 +111,7 @@ public class BarrageManager {
     if (!parser[dirName][fileName]) {
       char[] barrageName = dirName ~ "/" ~ fileName;
       Logger.info("Load BulletML: " ~ barrageName);
-      parser[dirName][fileName] = 
+      parser[dirName][fileName] =
         BulletMLParserTinyXML_new(std.string.toStringz(BARRAGE_DIR_NAME ~ "/" ~ barrageName));
       BulletMLParserTinyXML_parse(parser[dirName][fileName]);
     }

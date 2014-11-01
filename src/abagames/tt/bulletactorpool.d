@@ -74,11 +74,11 @@ public class BulletActorPool: ActorPool!(BulletActor), BulletsManager {
   }
 
   public BulletActor addTopBullet(ParserParam[] parserParam,
-				  float x, float y, float deg, float speed,
-				  Drawable shape, Drawable disapShape,
-				  float xReverse, float yReverse, bool longRange,
-				  BulletTarget target,
-				  int prevWait, int postWait) {
+                                  float x, float y, float deg, float speed,
+                                  Drawable shape, Drawable disapShape,
+                                  float xReverse, float yReverse, bool longRange,
+                                  BulletTarget target,
+                                  int prevWait, int postWait) {
     BulletActor ba = getInstance();
     if (!ba)
       return null;
@@ -94,7 +94,7 @@ public class BulletActorPool: ActorPool!(BulletActor), BulletsManager {
   }
 
   public BulletActor addMoveBullet(BulletMLParser *parser, float speed,
-				   float x, float y, float deg, BulletTarget target) {
+                                   float x, float y, float deg, BulletTarget target) {
     BulletActor ba = getInstance();
     if (!ba)
       return null;
@@ -146,7 +146,7 @@ public class BulletActorPool: ActorPool!(BulletActor), BulletsManager {
       if (ba.exists)
         ba.checkShotHit(pos, shape, shot);
   }
-  
+
   public static void registFunctions(BulletMLRunner* runner) {
     BulletMLRunner_set_getBulletDirection(runner, &getBulletDirection_);
     BulletMLRunner_set_getAimDirection(runner, &getAimDirectionWithRev_);

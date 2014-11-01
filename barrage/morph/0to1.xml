@@ -5,20 +5,20 @@
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 
 <action label="top">
-	<changeSpeed>
-		<speed>0</speed>
-		<term>1</term>
-	</changeSpeed>
-	<wait>1</wait>
-	<changeSpeed>
-		<speed>1</speed>
-		<term>60-$rank*50</term>
-	</changeSpeed>
-	<wait>60-$rank*50</wait>
-	<fire>
-		<direction type="relative">0</direction>
-		<bullet/>
-	</fire>
+ <changeSpeed>
+  <speed>0</speed>
+  <term>1</term>
+ </changeSpeed>
+ <wait>1</wait>
+ <changeSpeed>
+  <speed>1</speed>
+  <term>60-$rank*50</term>
+ </changeSpeed>
+ <wait>60-$rank*50</wait>
+ <fire>
+  <direction type="relative">0</direction>
+  <bullet/>
+ </fire>
 </action>
 
 </bulletml>

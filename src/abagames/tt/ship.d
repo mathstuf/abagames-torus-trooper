@@ -403,7 +403,7 @@ public class Ship: BulletTarget {
              0.9, 0.5, 1.0);
     }
   }
-  
+
   public Vector getTargetPos() {
     return _relPos;
   }
@@ -462,8 +462,8 @@ public class Ship: BulletTarget {
       lz += mz;
     }
     gluLookAt(ex, ey, ez,
-	      lx, ly, lz,
-	      sin(deg), -cos(deg) , 0);
+              lx, ly, lz,
+              sin(deg), -cos(deg) , 0);
   }
 
   public void setScreenShake(int cnt, float its) {

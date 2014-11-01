@@ -32,7 +32,7 @@ public class MainLoop {
   PrefManager prefManager;
 
   public this(Screen screen, Input input,
-	      GameManager gameManager, PrefManager prefManager) {
+              GameManager gameManager, PrefManager prefManager) {
     this.screen = screen;
     this.input = input;
     gameManager.setMainLoop(this);
@@ -74,35 +74,35 @@ public class MainLoop {
     int i;
     long nowTick;
     int frame;
-    
+
     screen.initSDL();
     initFirst();
     gameManager.start();
 
     while (!done) {
       if (SDL_PollEvent(&event) == 0)
-	event.type = SDL_USEREVENT;
+        event.type = SDL_USEREVENT;
       input.handleEvent(&event);
       if (event.type == SDL_QUIT)
-	breakLoop();
+        breakLoop();
       nowTick = SDL_GetTicks();
       frame = cast(int) (nowTick-prvTickCount) / interval;
       if (frame <= 0) {
-	frame = 1;
-	SDL_Delay(prvTickCount+interval-nowTick);
-	if (accframe) {
-	  prvTickCount = SDL_GetTicks();
-	} else {
-	  prvTickCount += interval;
-	}
+        frame = 1;
+        SDL_Delay(prvTickCount+interval-nowTick);
+        if (accframe) {
+          prvTickCount = SDL_GetTicks();
+        } else {
+          prvTickCount += interval;
+        }
       } else if (frame > maxSkipFrame) {
-	frame = maxSkipFrame;
-	prvTickCount = nowTick;
+        frame = maxSkipFrame;
+        prvTickCount = nowTick;
       } else {
-	prvTickCount += frame * interval;
+        prvTickCount += frame * interval;
       }
       for (i = 0; i < frame; i++) {
-	gameManager.move();
+        gameManager.move();
       }
       screen.clear();
       gameManager.draw();

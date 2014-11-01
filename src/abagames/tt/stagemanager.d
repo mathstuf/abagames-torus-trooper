@@ -547,7 +547,7 @@ public class ShipSpec {
   public static BitShape bitShape() {
     return _bitShape;
   }
- 
+
   public ShipShape shape() {
     return _shape;
   }

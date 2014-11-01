@@ -9,8 +9,8 @@
   <wait>1</wait>
   <fire>
    <bullet>
-   	<direction type="relative">0</direction>
-	<speed type="relative">$rank</speed>
+    <direction type="relative">0</direction>
+    <speed type="relative">$rank</speed>
     <actionRef label="ofs">
      <param>90</param>
     </actionRef>
@@ -18,8 +18,8 @@
   </fire>
   <fire>
    <bullet>
-   	<direction type="relative">0</direction>
-	<speed type="relative">$rank</speed>
+    <direction type="relative">0</direction>
+    <speed type="relative">$rank</speed>
     <actionRef label="ofs">
      <param>-90</param>
     </actionRef>
@@ -40,9 +40,9 @@
   </changeDirection>
   <wait>1</wait>
   <fire>
-  	<direction type="relative">0</direction>
-	<speed type="relative">-$rank</speed>
-	<bullet/>
+   <direction type="relative">0</direction>
+   <speed type="relative">-$rank</speed>
+   <bullet/>
   </fire>
   <vanish/>
 </action>

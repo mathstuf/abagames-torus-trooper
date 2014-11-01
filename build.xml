@@ -75,6 +75,6 @@
 			<arg value="-I${import}"/>
 			<arg value="-op"/>
 			<srcfile/>
-		</apply>	
+		</apply>
 	</target>
 </project>

@@ -11,7 +11,7 @@
    <bullet/>
   </fire>
   <actionRef label="grw">
-  	<param>0.5-$rand*1</param>
+   <param>0.5-$rand*1</param>
   </actionRef>
   <wait>60</wait>
 </action>

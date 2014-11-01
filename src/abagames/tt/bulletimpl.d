@@ -28,7 +28,7 @@ public class BulletImpl: Bullet {
   public this(int id) {
     super(id);
   }
-  
+
   public void setParamFirst(ParserParam[] parserParam,
                             Drawable shape, Drawable disapShape,
                             float xReverse, float yReverse, bool longRange,
@@ -60,7 +60,7 @@ public class BulletImpl: Bullet {
   public void addParser(BulletMLParser *p, float r, float re, float s) {
     parserParam ~= new ParserParam(p, r, re, s);
   }
-  
+
   public bool gotoNextParser() {
     parserIdx++;
     if (parserIdx >= parserParam.length) {
@@ -74,7 +74,7 @@ public class BulletImpl: Bullet {
   public BulletMLParser* getParser() {
     return parserParam[parserIdx].parser;
   }
-  
+
   public void resetParser() {
     parserIdx = 0;
   }

@@ -996,7 +996,7 @@ public class Ring {
       d += md;
     }
   }
-  
+
   public void close() {
     displayList.close();
   }

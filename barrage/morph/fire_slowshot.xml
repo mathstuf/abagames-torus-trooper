@@ -5,12 +5,12 @@
           xmlns="http://www.asahi-net.or.jp/~cs8k-cyu/bulletml">
 
 <action label="top">
-	<wait>4</wait>
-	<fire>
-		<direction type="relative">($rank+0.5)*$rand</direction>
-		<speed type="relative">-0.3</speed>
-		<bullet/>
-	</fire>
+ <wait>4</wait>
+ <fire>
+  <direction type="relative">($rank+0.5)*$rand</direction>
+  <speed type="relative">-0.3</speed>
+  <bullet/>
+ </fire>
 </action>
 
 </bulletml>

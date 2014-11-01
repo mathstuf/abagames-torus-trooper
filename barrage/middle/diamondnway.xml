@@ -9,7 +9,7 @@
   <bullet/>
  </fire>
  <repeat> <times>1+$rank*4.2</times>
-  <action> 
+  <action>
    <wait>4</wait>
    <fire>
     <direction type="sequence">-3.5+$rank*1</direction>
@@ -25,7 +25,7 @@
   <bullet/>
  </fire>
  <repeat> <times>1+$rank*4.2</times>
-  <action> 
+  <action>
    <wait>4</wait>
    <fire>
     <direction type="sequence">3.5-$rank*1</direction>

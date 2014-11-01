@@ -21,12 +21,12 @@ public class Tokenizer {
     for (;;) {
       char[] line = fd.readLine();
       if (!line)
-	break;
+        break;
       char[][] spl = split(line, separator);
       foreach (char[] s; spl) {
-	char[] r = strip(s);
-	if (r.length > 0)
-	  result ~= r;
+        char[] r = strip(s);
+        if (r.length > 0)
+          result ~= r;
       }
     }
     fd.close();

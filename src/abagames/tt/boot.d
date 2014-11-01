@@ -40,9 +40,9 @@ version (Win32_release) {
 
   extern (Windows)
   public int WinMain(HINSTANCE hInstance,
-		     HINSTANCE hPrevInstance,
-		     LPSTR lpCmdLine,
-		     int nCmdShow) {
+                     HINSTANCE hPrevInstance,
+                     LPSTR lpCmdLine,
+                     int nCmdShow) {
     int result;
     gc_init();
     _minit();

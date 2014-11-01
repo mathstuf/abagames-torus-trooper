@@ -77,8 +77,8 @@ public class Bullet {
     this.runner = runner;
   }
 
-  public void set(BulletMLRunner* runner, 
-		  float x, float y, float deg, float speed, float rank) {
+  public void set(BulletMLRunner* runner,
+                  float x, float y, float deg, float speed, float rank) {
     set(x, y, deg, speed, rank);
     setRunner(runner);
   }
