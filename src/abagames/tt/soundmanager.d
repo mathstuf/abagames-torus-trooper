@@ -44,7 +44,8 @@ public class SoundManager: abagames.util.sdl.sound.SoundManager {
 
   private static Music[] loadMusics() {
     Music[] musics;
-    foreach (string fileName; dirEntries(Music.dir, "*.{ogg,wav}", SpanMode.shallow)) {
+    foreach (string filePath; dirEntries(Music.dir, "*.{ogg,wav}", SpanMode.shallow)) {
+      string fileName = baseName(filePath);
       Music music = new Music();
       music.load(fileName);
       musics ~= music;
