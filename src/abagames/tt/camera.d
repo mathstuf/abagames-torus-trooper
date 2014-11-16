@@ -74,6 +74,8 @@ public class Camera {
         zoomTrg = 1.0f + rand.nextSignedFloat(0.25f);
         _zoom = 0.2f + rand.nextFloat(0.8f);
         break;
+      default:
+        assert(0);
       }
       _cameraPos.x = cameraTrg.x;
       _cameraPos.y = cameraTrg.y;
@@ -112,6 +114,8 @@ public class Camera {
         od += PI * 2;
       _deg += od * 0.2f;
       break;
+    default:
+      assert(0);
     }
     cox -= cameraPos.x;
     while (cox >= PI)

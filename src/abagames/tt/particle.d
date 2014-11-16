@@ -177,6 +177,8 @@ public class Particle: LuminousActor {
     case PType.FRAGMENT:
       drawFragment();
       break;
+    default:
+      assert(0);
     }
   }
 

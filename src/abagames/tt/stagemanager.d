@@ -541,6 +541,8 @@ public class ShipSpec {
       ofs.y = 0;
       deg = PI;
       break;
+    default:
+      assert(0);
     }
   }
 

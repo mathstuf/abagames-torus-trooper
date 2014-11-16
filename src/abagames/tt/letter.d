@@ -115,6 +115,8 @@ public class Letter {
     case Direction.TO_UP:
       ld = 270;
       break;
+    default:
+      assert(0);
     }
     ld += od;
     foreach (char c; str) {
@@ -139,6 +141,8 @@ public class Letter {
         case Direction.TO_UP:
           y -= s * LETTER_WIDTH;
           break;
+        default:
+          assert(0);
         }
       } else {
         x += cos(ld * PI / 180) * s * LETTER_WIDTH;
@@ -167,6 +171,8 @@ public class Letter {
     case Direction.TO_UP:
       ld = 270;
       break;
+    default:
+      assert(0);
     }
     int digit = dg;
     for (;;) {
@@ -184,6 +190,8 @@ public class Letter {
       case Direction.TO_UP:
         y += s * LETTER_WIDTH;
         break;
+      default:
+        assert(0);
       }
       n /= 10;
       digit--;

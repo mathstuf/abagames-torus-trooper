@@ -94,6 +94,8 @@ public class ShipShape: Collidable, Drawable {
     case Type.LARGE:
       createLargeType(damaged);
       break;
+    default:
+      assert(0);
     }
     createDisplayList();
     rocketPos = vec2(0);
@@ -140,6 +142,8 @@ public class ShipShape: Collidable, Drawable {
       rocketX ~= sx * 0.05;
       rocketX ~= -sx * 0.05;
       break;
+    default:
+      assert(0);
     }
     _collision.x *= 0.1;
     _collision.y *= 1.2;
@@ -185,6 +189,8 @@ public class ShipShape: Collidable, Drawable {
       rocketX ~= sx * 0.05;
       rocketX ~= -sx * 0.05;
       break;
+    default:
+      assert(0);
     }
     _collision.x *= 0.1;
     _collision.y *= 1.2;
@@ -238,6 +244,8 @@ public class ShipShape: Collidable, Drawable {
       rocketX ~= sx * 0.05;
       rocketX ~= -sx * 0.05;
       break;
+    default:
+      assert(0);
     }
     _collision.x *= 0.1;
     _collision.y *= 1.2;
@@ -479,6 +487,8 @@ public class Structure {
         glEnd();
       }
       break;
+    default:
+      assert(0);
     }
     glPopMatrix();
   }
@@ -576,6 +586,8 @@ public class BulletShape: Drawable {
     case 5:
       createBarShape(true);
       break;
+    default:
+      assert(0);
     }
     displayList.endNewList();
   }

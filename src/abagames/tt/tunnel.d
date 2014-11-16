@@ -761,6 +761,8 @@ public class TorusPart {
       case 2:
         _sliceState.changeWidthToFull();
         break;
+      default:
+        assert(0);
       }
     } else {
       switch (rand.nextInt(4)) {
@@ -948,6 +950,8 @@ public class Ring {
     case 1:
       createFinalRing(r);
       break;
+    default:
+      assert(0);
     }
   }
 
