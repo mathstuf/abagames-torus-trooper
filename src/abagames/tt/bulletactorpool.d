@@ -106,7 +106,7 @@ public class BulletActorPool: ActorPool!(BulletActor), BulletsManager {
     cnt++;
   }
 
-  public void draw() {
+  public override void draw() {
     foreach (BulletActor ba; actor)
       if (ba.exists)
         ba.draw();

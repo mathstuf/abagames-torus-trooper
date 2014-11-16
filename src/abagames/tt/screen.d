@@ -65,7 +65,7 @@ public class Screen: Screen3D {
       luminousScreen.draw();
   }
 
-  public void resized(int width, int height) {
+  public override void resized(int width, int height) {
     if (luminousScreen)
       luminousScreen.resized(width, height);
     super.resized(width, height);

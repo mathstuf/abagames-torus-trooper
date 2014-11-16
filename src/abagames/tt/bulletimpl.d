@@ -69,7 +69,7 @@ public class BulletImpl: Bullet {
     }
   }
 
-  public double getAimDirection() {
+  public override double getAimDirection() {
     vec2 b = pos;
     vec2 t = activeTarget;
     float xrev = xReverse;
