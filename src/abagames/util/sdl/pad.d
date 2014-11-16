@@ -28,7 +28,7 @@ public class Pad: Input {
   int lastDirState = 0, lastButtonState = 0;
  private:
   SDL_Joystick *stick = null;
-  const int JOYSTICK_AXIS = 16384;
+  static const int JOYSTICK_AXIS = 16384;
 
   public void openJoystick() {
     if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0) {
