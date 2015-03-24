@@ -9,6 +9,7 @@ set(util_sdl_srcs
     screen.d
     screen3d.d
     sdlexception.d
+    shaderprogram.d
     sound.d
     texture.d)
 
