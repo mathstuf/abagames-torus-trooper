@@ -20,7 +20,7 @@ private import abagames.tt.particle;
  * Interface for drawing a shape.
  */
 public interface Drawable {
-  public void draw(mat4 view);
+  public void draw(mat4 view, mat4 model);
 }
 
 /**
@@ -327,7 +327,7 @@ public class ShipShape: Collidable, Drawable {
     }
   }
 
-  public void draw(mat4 view) {
+  public void draw(mat4 view, mat4 model) {
     displayList.call(0);
   }
 
@@ -368,6 +368,16 @@ public class Structure {
   }
 
   public void createDisplayList() {
+    mat4 model = mat4.identity;
+    model.scale(shapeXReverse, 1, 1);
+    if (shape == Shape.ROCKET)
+      model.scale(width, width, height);
+    else
+      model.scale(width, height, 1);
+    model.rotate(-d1 / 180 * PI, vec3(0, 0, 1));
+    model.rotate(d2 / 180 * PI, vec3(1, 0, 0));
+    model.translate(pos.x, pos.y, 0);
+
     glPushMatrix();
     glTranslatef(pos.x, pos.y, 0);
     glRotatef(-d2, 1, 0, 0);
@@ -538,7 +548,7 @@ public class BitShape: Drawable {
     displayList.close();
   }
 
-  public void draw(mat4 view) {
+  public void draw(mat4 view, mat4 model) {
     displayList.call(0);
   }
 }
@@ -726,7 +736,7 @@ public class BulletShape: Drawable {
     }
   }
 
-  public void draw(mat4 view) {
+  public void draw(mat4 view, mat4 model) {
     displayList.call(0);
   }
 }
@@ -787,7 +797,7 @@ public class ShotShape: Collidable, Drawable {
     displayList.close();
   }
 
-  public void draw(mat4 view) {
+  public void draw(mat4 view, mat4 model) {
     displayList.call(0);
   }
 
@@ -806,9 +816,11 @@ public class ResizableDrawable: Collidable, Drawable {
   float _size;
   vec2 _collision;
 
-  public void draw(mat4 view) {
+  public void draw(mat4 view, mat4 model) {
+    mat4 scalemat = mat4.identity;
+    scalemat.scale(_size, _size, _size);
     glScalef(_size, _size, _size);
-    _shape.draw(view);
+    _shape.draw(view, model * scalemat);
   }
 
   public Drawable shape(Drawable v) {

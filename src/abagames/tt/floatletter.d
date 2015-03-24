@@ -66,8 +66,12 @@ public class FloatLetter: Actor {
   }
 
   public override void draw(mat4 view) {
-    glPushMatrix();
     vec3 sp = tunnel.getPos(pos);
+
+    mat4 model = mat4.identity;
+    model.translate(0, 0, sp.z);
+
+    glPushMatrix();
     glTranslatef(0, 0, sp.z);
     Screen.setColor(1, 1, 1, 1);
     Letter.drawString(view, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 2, false, d  * 180 / PI);

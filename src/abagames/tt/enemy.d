@@ -351,6 +351,17 @@ public class Enemy: Actor {
 
   public override void draw(mat4 view) {
     vec3 sp = tunnel.getPos(pos);
+
+    mat4 model = mat4.identity;
+    model.rotate(-d2, vec3(1, 0, 0));
+    model.rotate(-d1, vec3(0, 1, 0));
+    if (sp.z > 200) {
+      float sz = 1 - (sp.z - 200) * 0.0025;
+      model.scale(sz, sz, sz);
+    }
+    model.rotate(bank - pos.x, vec3(0, 0, 1));
+    model.translate(sp.x, sp.y, sp.z);
+
     glPushMatrix();
     Screen.glTranslate(sp);
     glRotatef((pos.x - bank) * 180 / PI, 0, 0, 1);
@@ -361,18 +372,26 @@ public class Enemy: Actor {
     glRotatef(d1 * 180 / PI, 0, 1, 0);
     glRotatef(d2 * 180 / PI, 1, 0, 0);
     if (!damaged)
-      spec.shape.draw(view);
+      spec.shape.draw(view, model);
     else
-      spec.damagedShape.draw(view);
+      spec.damagedShape.draw(view, model);
     glPopMatrix();
     if (bitBullet) {
+      mat4 bulletBase = mat4.identity;
+      bulletBase.rotate(-pos.x, vec3(0, 0, 1));
+      bulletBase.rotate(-bitCnt * 7. * 180 / PI, vec3(0, 1, 0));
+
       foreach (BulletActor bb; bitBullet) {
         sp = tunnel.getPos(bb.bullet.pos);
+
+        model = bulletBase;
+        model.translate(sp.x, sp.y, sp.z);
+
         glPushMatrix();
         Screen.glTranslate(sp);
         glRotatef(bitCnt * 7, 0, 1, 0);
         glRotatef(pos.x * 180 / PI, 0, 0, 1);
-        ShipSpec.bitShape.draw(view);
+        ShipSpec.bitShape.draw(view, model);
         glPopMatrix();
       }
     }

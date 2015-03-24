@@ -225,16 +225,22 @@ public class BulletActor: Actor {
       return;
     float d = (bullet.deg * bullet.xReverse + PI / 2) * bullet.yReverse - PI / 2;
     vec3 sp = tunnel.getPos(bullet.pos);
+
+    mat4 model = mat4.identity;
+    model.rotate(-cnt * 6. / 180 * PI, vec3(0, 0, 1));
+    model.rotate(-d, vec3(0, 1, 0));
+    model.translate(sp.x, sp.y, sp.z);
+
     glPushMatrix();
     glTranslatef(sp.x, sp.y, sp.z);
     glRotatef(d * 180 / PI, 0, 1, 0);
     glRotatef(cnt * 6, 0, 0, 1);
     if (disapCnt <= 0) {
-      bullet.shape.draw(view);
+      bullet.shape.draw(view, model);
     } else {
       float s = 1 - cast(float) disapCnt / DISAP_CNT;
       glScalef(s, s, s);
-      bullet.disapShape.draw(view);
+      bullet.disapShape.draw(view, model);
     }
     glPopMatrix();
   }

@@ -996,6 +996,13 @@ public class Ring {
     Screen.setColor(COLOR_RGB[type][0] * a,
                     COLOR_RGB[type][1] * a,
                     COLOR_RGB[type][2] * a);
+
+    mat4 model = mat4.identity;
+    model.rotate(-d2 / 180 * PI, vec3(1, 0, 0));
+    model.rotate(-d1 / 180 * PI, vec3(0, 1, 0));
+    model.rotate(-cnt * 1. / 180 * PI, vec3(0, 0, 1));
+    model.translate(p.x, p.y, p.z);
+
     glPushMatrix();
     glTranslatef(p.x, p.y, p.z);
     glRotatef(cnt * 1.0f, 0, 0, 1);
@@ -1004,6 +1011,12 @@ public class Ring {
     displayList.call(0);
     glPopMatrix();
     if (type == 1) {
+      model = mat4.identity;
+      model.rotate(-d2 / 180 * PI, vec3(1, 0, 0));
+      model.rotate(-d1 / 180 * PI, vec3(0, 1, 0));
+      model.rotate(cnt * 1. / 180 * PI, vec3(0, 0, 1));
+      model.translate(p.x, p.y, p.z);
+
       glPushMatrix();
       glTranslatef(p.x, p.y, p.z);
       glRotatef(cnt * -1.0f, 0, 0, 1);

@@ -50,6 +50,11 @@ public class Letter {
   }
 
   private static void drawLetter(mat4 view, int n, float x, float y, float s, float d, int c) {
+    mat4 model = mat4.identity;
+    model.rotate(-d / 180 * PI, vec3(0, 0, 1));
+    model.scale(s, s, s);
+    model.translate(x, y, 0);
+
     glPushMatrix();
     glTranslatef(x, y, 0);
     glScalef(s, s, s);
@@ -59,6 +64,11 @@ public class Letter {
   }
 
   private static void drawLetterRev(mat4 view, int n, float x, float y, float s, float d, int c) {
+    mat4 model = mat4.identity;
+    model.rotate(-d / 180 * PI, vec3(0, 0, 1));
+    model.scale(s, -s, s);
+    model.translate(x, y, 0);
+
     glPushMatrix();
     glTranslatef(x, y, 0);
     glScalef(s, -s, s);
@@ -284,6 +294,8 @@ public class Letter {
 
   private static void drawBox(mat4 view, float x, float y, float width, float height, float deg,
                               float r, float g, float b) {
+    mat4 model = drawBoxMat(x, y, width, height, deg);
+
     glPushMatrix();
     glTranslatef(x - width / 2, y - height / 2, 0);
     glRotatef(deg, 0, 0, 1);
@@ -299,6 +311,8 @@ public class Letter {
   }
 
   private static void drawBoxLine(mat4 view, float x, float y, float width, float height, float deg) {
+    mat4 model = drawBoxMat(x, y, width, height, deg);
+
     glPushMatrix();
     glTranslatef(x - width / 2, y - height / 2, 0);
     glRotatef(deg, 0, 0, 1);
@@ -309,6 +323,8 @@ public class Letter {
   }
 
   private static void drawBoxPoly(mat4 view, float x, float y, float width, float height, float deg) {
+    mat4 model = drawBoxMat(x, y, width, height, deg);
+
     glPushMatrix();
     glTranslatef(x - width / 2, y - height / 2, 0);
     glRotatef(deg, 0, 0, 1);
@@ -316,6 +332,14 @@ public class Letter {
     drawBoxPart(view, width, height);
     glEnd();
     glPopMatrix();
+  }
+
+  private static mat4 drawBoxMat(float x, float y, float width, float height, float deg) {
+    mat4 model = mat4.identity;
+    model.rotate(-deg / 180 * PI, vec3(0, 0, 1));
+    model.translate(x - width / 2, y - height / 2, 0);
+
+    return model;
   }
 
   private static void drawBoxPart(mat4 view, float width, float height) {

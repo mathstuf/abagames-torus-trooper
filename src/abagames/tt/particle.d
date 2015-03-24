@@ -206,6 +206,11 @@ public class Particle: LuminousActor {
   }
 
   private void drawFragment(mat4 view) {
+    mat4 model = mat4.identity;
+    model.rotate(-d2 / 180 * PI, vec3(0, 1, 0));
+    model.rotate(-d1 / 180 * PI, vec3(0, 0, 1));
+    model.translate(sp.x, sp.y, sp.z);
+
     glPushMatrix();
     glTranslatef(sp.x, sp.y, sp.z);
     glRotatef(d1, 0, 0, 1);

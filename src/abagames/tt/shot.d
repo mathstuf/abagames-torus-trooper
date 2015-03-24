@@ -192,11 +192,17 @@ public class Shot: Actor {
 
   public override void draw(mat4 view) {
     vec3 sp = tunnel.getPos(pos);
+
+    mat4 model = mat4.identity;
+    model.rotate(-cnt * 7. / 180 * PI, vec3(0, 0, 1));
+    model.rotate(-deg, vec3(0, 1, 10));
+    model.translate(sp.x, sp.y, sp.z);
+
     glPushMatrix();
     Screen.glTranslate(sp);
     glRotatef(deg * 180 / PI, 0, 1, 10);
     glRotatef(cnt * 7, 0, 0, 1);
-    shape.draw(view);
+    shape.draw(view, model);
     glPopMatrix();
   }
 

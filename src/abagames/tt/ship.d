@@ -576,12 +576,18 @@ public class Ship: BulletTarget {
   public void draw(mat4 view) {
     if (cnt < -INVINCIBLE_CNT || (cnt < 0 && (-cnt % 32) < 16))
       return;
+    mat4 model = mat4.identity;
+    model.rotate(-d2, vec3(1, 0, 0));
+    model.rotate(-d1, vec3(0, 1, 0));
+    model.rotate(bank - pos.x, vec3(0, 0, 1));
+    model.translate(pos3.x, pos3.y, pos3.z);
+
     glPushMatrix();
     glTranslatef(pos3.x, pos3.y, pos3.z);
     glRotatef((pos.x - bank) * 180 / PI, 0, 0, 1);
     glRotatef(d1 * 180 / PI, 0, 1, 0);
     glRotatef(d2 * 180 / PI, 1, 0, 0);
-    _shape.draw(view);
+    _shape.draw(view, model);
     glPopMatrix();
   }
 

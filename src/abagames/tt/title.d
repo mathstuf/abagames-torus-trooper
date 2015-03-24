@@ -216,6 +216,12 @@ public class TitleManager {
   public void drawFront(mat4 view) {
     if (_replayChangeRatio > 0)
       return;
+
+    mat4 model = mat4.identity;
+    model.scale(128, 64, 1);
+    model.rotate(20 / 180 * PI, vec3(0, 0, 1));
+    model.translate(508, 400, 0);
+
     glPushMatrix();
     glTranslatef(508, 400, 0);
     glRotatef(-20, 0, 0, 1);
@@ -288,6 +294,11 @@ public class TitleManager {
   }
 
   private void drawCursorRing(float x, float y, float s) {
+    mat4 model = mat4.identity;
+    model.scale(s * 2, s, 1);
+    model.rotate(20 / 180 * PI, vec3(0, 0, 1));
+    model.translate(x, y, 0);
+
     glPushMatrix();
     glTranslatef(x, y, 0);
     glRotatef(-20, 0, 0, 1);
