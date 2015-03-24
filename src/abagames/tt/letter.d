@@ -50,28 +50,22 @@ public class Letter {
   }
 
   private static void drawLetter(mat4 view, int n, float x, float y, float s, float d, int c) {
-    mat4 model = mat4.identity;
-    model.rotate(-d / 180 * PI, vec3(0, 0, 1));
-    model.scale(s, s, s);
-    model.translate(x, y, 0);
-
-    glPushMatrix();
-    glTranslatef(x, y, 0);
-    glScalef(s, s, s);
-    glRotatef(d, 0, 0, 1);
-    displayList.call(n + c * LETTER_NUM);
-    glPopMatrix();
+    drawLetter(view, n, x, y, s, 1, d, c);
   }
 
   private static void drawLetterRev(mat4 view, int n, float x, float y, float s, float d, int c) {
+    drawLetter(view, n, x, y, s, -1, d, c);
+  }
+
+  private static void drawLetter(mat4 view, int n, float x, float y, float s, int f, float d, int c) {
     mat4 model = mat4.identity;
     model.rotate(-d / 180 * PI, vec3(0, 0, 1));
-    model.scale(s, -s, s);
+    model.scale(s, s * f, s);
     model.translate(x, y, 0);
 
     glPushMatrix();
     glTranslatef(x, y, 0);
-    glScalef(s, -s, s);
+    glScalef(s, s * f, s);
     glRotatef(d, 0, 0, 1);
     displayList.call(n + c * LETTER_NUM);
     glPopMatrix();
