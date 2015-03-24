@@ -40,7 +40,6 @@ public class Bullet: bml.BulletManager {
   public static void setBulletsManager(BulletsManager bm) {
     manager = bm;
     activeTarget = vec2(0);
-    activeTarget.x = activeTarget.y = 0;
   }
 
   public this(int id) {
@@ -134,8 +133,8 @@ public class Bullet: bml.BulletManager {
   }
 
   public void set(float x, float y, float deg, float speed, float rank) {
-    pos.x = x; pos.y = y;
-    acc.x = acc.y = 0;
+    pos = vec2(x, y);
+    acc = vec2(0);
     this.deg = deg;
     this.speed = speed;
     this.rank = rank;

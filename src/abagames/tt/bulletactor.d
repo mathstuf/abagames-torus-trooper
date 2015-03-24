@@ -78,8 +78,7 @@ public class BulletActor: Actor {
     isWait = false;
     isVisible = true;
     isMorphSeed = false;
-    ppos.x = bullet.pos.x;
-    ppos.y = bullet.pos.y;
+    ppos = bullet.pos;
     cnt = 0;
     rootRank = 1;
     shouldBeRemoved = false;
@@ -137,10 +136,8 @@ public class BulletActor: Actor {
 
   public override void move() {
     vec2 tpos = bullet.target.getTargetPos();
-    Bullet.activeTarget.x = tpos.x;
-    Bullet.activeTarget.y = tpos.y;
-    ppos.x = bullet.pos.x;
-    ppos.y = bullet.pos.y;
+    Bullet.activeTarget = tpos;
+    ppos = bullet.pos;
     if (isAimTop) {
       float ox = tpos.x - bullet.pos.x;
       if (ox > PI)
@@ -184,8 +181,7 @@ public class BulletActor: Actor {
     float d = atan2(mx, my);
     float r = 1 - fabs(sin(d)) * 0.999f;
     r *= (ship.speed * 5);
-    bullet.pos.x += mx * r;
-    bullet.pos.y += my * r;
+    bullet.pos += vec2(mx, my) * r;
 
     if (bullet.pos.x >= PI * 2)
       bullet.pos.x -= PI * 2;

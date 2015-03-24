@@ -298,7 +298,6 @@ public class TitleManager {
 
   private void createTorusShape() {
     vec3 cp = vec3(0);
-    cp.z = 0;
     vec3 ringOfs = vec3(0);
     float torusRad = 5;
     float ringRad = 0.7;
@@ -382,9 +381,7 @@ public class TitleManager {
 
   public void createRingOffset(vec3 ringOfs, vec3 centerPos,
                                float rad, float d1, float d2) {
-    ringOfs.x = 0;
-    ringOfs.y = rad;
-    ringOfs.z = 0;
+    ringOfs = vec3(0, rad, 0);
     ringOfs.rollX(d2);
     ringOfs.rollZ(-d1);
     ringOfs += centerPos;

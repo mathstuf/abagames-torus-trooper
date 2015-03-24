@@ -33,16 +33,14 @@ public interface Collidable {
 
 private template CollidableImpl() {
   public bool checkCollision(float ax, float ay, Collidable shape = null, float speed = 1) {
-    float cx, cy;
+    vec2 c;
     if (shape) {
-      cx = collision.x + shape.collision.x;
-      cy = collision.y + shape.collision.y;
+      c = collision + shape.collision;
     } else {
-      cx = collision.x;
-      cy = collision.y;
+      c = collision;
     }
-    cy *= speed;
-    if (ax <= cx && ay <= cy)
+    c.y *= speed;
+    if (ax <= c.x && ay <= c.y)
       return true;
     else
       return false;
@@ -258,8 +256,7 @@ public class ShipShape: Collidable, Drawable {
                                   int rev, bool damaged = false) {
     Structure[] sts;
     Structure st = new Structure;
-    st.pos.x = ox;
-    st.pos.y = oy;
+    st.pos = vec2(ox, oy);
     st.d1 = st.d2 = 0;
     st.width = rocketLength * 0.15;
     st.height = rocketLength;
@@ -278,8 +275,7 @@ public class ShipShape: Collidable, Drawable {
       st = new Structure;
       st.d1 = wingD1 * 180 / PI;
       st.d2 = wingD2 * 180 / PI;
-      st.pos.x = ox + sin(od1) * wofs;
-      st.pos.y = oy + cos(od1) * wofs;
+      st.pos = vec2(ox, oy) + vec2(sin(od1), cos(od1)) * wofs;
       st.width = wingWidth;
       st.height = whgt;
       st.shape = shp;
@@ -305,8 +301,7 @@ public class ShipShape: Collidable, Drawable {
       Particle pt = particles.getInstance();
       if (!pt)
         break;
-      rocketPos.x = pos.x + rx;
-      rocketPos.y = pos.y - 0.15;
+      rocketPos = pos + vec2(rx, -0.15);
       pt.set(rocketPos, 1, PI, 0, 0.2, 0.3, 0.4, 1.0, 16, Particle.PType.JET);
     }
   }
@@ -319,8 +314,7 @@ public class ShipShape: Collidable, Drawable {
       Particle pt = particles.getInstance();
       if (!pt)
         break;
-      fragmentPos.x = pos.x;
-      fragmentPos.y = pos.y;
+      fragmentPos = pos;
       float wb = collision.x;
       float hb = collision.y;
       pt.set(fragmentPos, 1, rand.nextSignedFloat(0.1),
@@ -606,15 +600,14 @@ public class BulletShape: Drawable {
     vec3 np3 = vec3(0);
     for (int i = 0; i < 3; i++) {
       float d = PI * 2 / 3 * i;
-      p1.x = p1.y = 0;
-      p1.z = 2.5f;
+      p1 = vec3(0, 0, 2.5f);
       p2.x = sin(d) * 1.8f;
       p2.y = cos(d) * 1.8f;
       p2.z = -1.2f;
       p3.x = sin(d + PI * 2 / 3) * 1.2f;
       p3.y = cos(d + PI * 2 / 3) * 1.2f;
       p3.z = -1.2f;
-      cp.x = cp.y = cp.z = 0;
+      cp = vec3(0);
       cp += p1;
       cp += p2;
       cp += p3;
@@ -660,7 +653,7 @@ public class BulletShape: Drawable {
     foreach (ref vec3 inp; np)
       inp = vec3(0);
     for (int i = 0; i < 6; i++) {
-      cp.x = cp.y = cp.z = 0;
+      cp = vec3(0);
       for (int j = 0; j < 4; j++) {
         p[j].x = POINT_DAT[i][j][0];
         p[j].y = POINT_DAT[i][j][1];
@@ -705,7 +698,7 @@ public class BulletShape: Drawable {
     foreach (ref vec3 inp; np)
       inp = vec3(0);
     for (int i = 0; i < 5; i++) {
-      cp.x = cp.y = cp.z = 0;
+      cp = vec3(0);
       for (int j = 0; j < 4; j++) {
         p[j].x = POINT_DAT[i][j][0] * 0.7f;
         p[j].y = POINT_DAT[i][j][1] * 0.7f;
@@ -830,8 +823,7 @@ public class ResizableDrawable: Collidable, Drawable {
   public vec2 collision() {
     Collidable cd = cast(Collidable) _shape;
     if (cd) {
-      _collision.x = cd.collision.x * _size;
-      _collision.y = cd.collision.y * _size;
+      _collision = cd.collision * _size;
       return _collision;
     } else {
       return vec2(0);

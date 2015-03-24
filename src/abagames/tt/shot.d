@@ -139,8 +139,7 @@ public class Shot: Actor {
         SoundManager.playSe("charge.wav");
       chargeSeCnt++;
     } else {
-      pos.x += sin(deg) * SPEED;
-      pos.y += cos(deg) * SPEED;
+      pos += vec2(sin(deg), cos(deg)) * SPEED;
       range -= SPEED;
       if (range <= 0)
         remove();

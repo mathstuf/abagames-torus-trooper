@@ -77,13 +77,9 @@ public class Camera {
       default:
         assert(0);
       }
-      _cameraPos.x = cameraTrg.x;
-      _cameraPos.y = cameraTrg.y;
-      _cameraPos.z = cameraTrg.z;
+      _cameraPos = cameraTrg;
       _deg = cameraTrg.x;
-      lookAtOfs.x = 0;
-      lookAtOfs.y = 0;
-      lookAtOfs.z = 0;
+      lookAtOfs = vec3(0);
       lookAtCnt = 0;
       zoomMin = 1.0f - rand.nextFloat(0.9f);
     }
@@ -96,17 +92,13 @@ public class Camera {
       lookAtCnt = 32 + rand.nextInt(48);
     }
     cameraTrg += cameraVel;
-    float cox, coy, coz;
+    vec3 co;
     switch (type) {
     case MoveType.FLOAT:
-      cox = cameraTrg.x;
-      coy = cameraTrg.y;
-      coz = cameraTrg.z;
+      co = cameraTrg;
       break;
     case MoveType.FIX:
-      cox = cameraTrg.x + ship.relPos.x;
-      coy = cameraTrg.y + ship.relPos.y;
-      coz = cameraTrg.z;
+      co = cameraTrg + vec3(ship.relPos, 0);
       float od = ship.relPos.x - _deg;
       while (od >= PI)
         od -= PI * 2;
@@ -117,37 +109,27 @@ public class Camera {
     default:
       assert(0);
     }
-    cox -= cameraPos.x;
-    while (cox >= PI)
-      cox -= PI * 2;
-    while (cox < -PI)
-      cox += PI * 2;
-    coy -= cameraPos.y;
-    coz -= cameraPos.z;
-    _cameraPos.x += cox * 0.12f;
-    _cameraPos.y += coy * 0.12f;
-    _cameraPos.z += coz * 0.12f;
+    co -= cameraPos;
+    while (co.x >= PI)
+      co.x -= PI * 2;
+    while (co.x < -PI)
+      co.x += PI * 2;
+    _cameraPos += co * 0.12f;
     float ofsRatio;
     if (lookAtCnt <= ZOOM_CNT)
       ofsRatio = 1.0f + fabs(zoomTrg - _zoom) * 2.5f;
     else
       ofsRatio = 1.0f;
-    float lox = ship.relPos.x + lookAtOfs.x * ofsRatio - _lookAtPos.x;
-    while (lox >= PI)
-      lox -= PI * 2;
-    while (lox < -PI)
-      lox += PI * 2;
-    float loy = ship.relPos.y + lookAtOfs.y * ofsRatio - _lookAtPos.y;
-    float loz = lookAtOfs.z * ofsRatio - _lookAtPos.z;
+    vec3 lo = vec3(ship.relPos, 0) + lookAtOfs * ofsRatio - _lookAtPos;
+    while (lo.x >= PI)
+      lo.x -= PI * 2;
+    while (lo.x < -PI)
+      lo.x += PI * 2;
     if (lookAtCnt <= ZOOM_CNT) {
       _zoom += (zoomTrg - _zoom) * 0.16f;
-      _lookAtPos.x += lox * 0.2f;
-      _lookAtPos.y += loy * 0.2f;
-      _lookAtPos.z += loz * 0.2f;
+      _lookAtPos += lo * 0.2f;
     } else {
-      _lookAtPos.x += lox * 0.1f;
-      _lookAtPos.y += lox * 0.1f;
-      _lookAtPos.z += loz * 0.1f;
+      _lookAtPos += lo * 0.1f;
     }
     lookAtOfs *= 0.985f;
     if (fabs(lookAtOfs.x) < 0.04f)

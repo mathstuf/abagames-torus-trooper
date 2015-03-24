@@ -65,9 +65,7 @@ public class Particle: LuminousActor {
   public void set(vec2 p, float z, float d, float mz, float speed,
                   float r, float g, float b, int c = 16,
                   int t = PType.SPARK, float w = 0, float h = 0) {
-    pos.x = p.x;
-    pos.y = p.y;
-    pos.z = z;
+    pos = vec3(p, z);
     float sb = rand.nextFloat(0.8) + 0.4;
     vel.x = sin(d) * speed * sb;
     vel.y = cos(d) * speed * sb;
@@ -101,13 +99,9 @@ public class Particle: LuminousActor {
       exists = false;
       return;
     }
-    psp.x = sp.x;
-    psp.y = sp.y;
-    psp.z = sp.z;
+    psp = sp;
     if (inCourse) {
-      rpsp.x = rsp.x;
-      rpsp.y = rsp.y;
-      rpsp.z = rsp.z;
+      rpsp = rsp;
     }
     pos += vel;
     if (type == PType.FRAGMENT)
@@ -145,22 +139,17 @@ public class Particle: LuminousActor {
 
   private void calcScreenPos() {
     vec3 p = tunnel.getPos(pos);
-    sp.x = p.x;
-    sp.y = p.y;
-    sp.z = p.z;
+    sp = p;
     if (inCourse) {
       pos.z = -pos.z;
       p = tunnel.getPos(pos);
-      rsp.x = p.x;
-      rsp.y = p.y;
-      rsp.z = p.z;
+      rsp = p;
       pos.z = -pos.z;
     }
   }
 
   private void checkInCourse() {
-    icp.x = pos.x;
-    icp.y = pos.y;
+    icp = pos.xy;
     if (tunnel.checkInCourse(icp) != 0)
       inCourse = false;
   }

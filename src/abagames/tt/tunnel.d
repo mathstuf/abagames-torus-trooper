@@ -127,15 +127,11 @@ public class Tunnel {
     float r = slice[si].state.rad * (1 - o) + slice[nsi].state.rad * o;
     float d1 = slice[si].d1 * (1 - o) + slice[nsi].d1 * o;
     float d2 = slice[si].d2 * (1 - o) + slice[nsi].d2 * o;
-    tpos.x = 0;
-    tpos.y = r * rr;
-    tpos.z = 0;
+    tpos = vec3(0, r * rr, 0);
     tpos.rollZ(d);
     tpos.rollY(d1);
     tpos.rollX(d2);
-    tpos.x += slice[si].centerPos.x * (1 - o) + slice[nsi].centerPos.x * o;
-    tpos.y += slice[si].centerPos.y * (1 - o) + slice[nsi].centerPos.y * o;
-    tpos.z += slice[si].centerPos.z * (1 - o) + slice[nsi].centerPos.z * o;
+    tpos += slice[si].centerPos * (1 - o) + slice[nsi].centerPos * o;
     return tpos;
   }
 
@@ -144,15 +140,11 @@ public class Tunnel {
     float r = sliceBackward[si].state.rad * (1 - o) + sliceBackward[nsi].state.rad * o;
     float d1 = sliceBackward[si].d1 * (1 - o) + sliceBackward[nsi].d1 * o;
     float d2 = sliceBackward[si].d2 * (1 - o) + sliceBackward[nsi].d2 * o;
-    tpos.x = 0;
-    tpos.y = r * rr;
-    tpos.z = 0;
+    tpos = vec3(0, r * rr, 0);
     tpos.rollZ(d);
     tpos.rollY(d1);
     tpos.rollX(d2);
-    tpos.x += sliceBackward[si].centerPos.x * (1 - o) + sliceBackward[nsi].centerPos.x * o;
-    tpos.y += sliceBackward[si].centerPos.y * (1 - o) + sliceBackward[nsi].centerPos.y * o;
-    tpos.z += sliceBackward[si].centerPos.z * (1 - o) + sliceBackward[nsi].centerPos.z * o;
+    tpos += sliceBackward[si].centerPos * (1 - o) + sliceBackward[nsi].centerPos * o;
     return tpos;
   }
 
@@ -193,17 +185,13 @@ public class Tunnel {
       size_t nsi = si + 1;
       d1 = slice[si].d1 * (1 - o) + slice[nsi].d1 * o;
       d2 = slice[si].d2 * (1 - o) + slice[nsi].d2 * o;
-      tpos.x = slice[si].centerPos.x * (1 - o) + slice[nsi].centerPos.x * o;
-      tpos.y = slice[si].centerPos.y * (1 - o) + slice[nsi].centerPos.y * o;
-      tpos.z = slice[si].centerPos.z * (1 - o) + slice[nsi].centerPos.z * o;
+      tpos = slice[si].centerPos * (1 - o) + slice[nsi].centerPos * o;
     } else {
       calcIndexBackward(y, si, o);
       size_t nsi = si + 1;
       d1 = sliceBackward[si].d1 * (1 - o) + sliceBackward[nsi].d1 * o;
       d2 = sliceBackward[si].d2 * (1 - o) + sliceBackward[nsi].d2 * o;
-      tpos.x = sliceBackward[si].centerPos.x * (1 - o) + sliceBackward[nsi].centerPos.x * o;
-      tpos.y = sliceBackward[si].centerPos.y * (1 - o) + sliceBackward[nsi].centerPos.y * o;
-      tpos.z = sliceBackward[si].centerPos.z * (1 - o) + sliceBackward[nsi].centerPos.z * o;
+      tpos = sliceBackward[si].centerPos * (1 - o) + sliceBackward[nsi].centerPos * o;
     }
     return tpos;
   }
@@ -445,7 +433,7 @@ public class Slice {
   }
 
   public void setFirst(float pf, SliceState state, float dpt) {
-    _centerPos.x = _centerPos.y = _centerPos.z = 0;
+    _centerPos = vec3(0);
     _d1 = _d2 = 0;
     _pointFrom = pf;
     _state.set(state);
@@ -456,13 +444,10 @@ public class Slice {
   public void set(Slice prevSlice, SliceState state, float depthRatio, float dpt) {
     _d1 = prevSlice.d1 + state.md1 * depthRatio;
     _d2 = prevSlice.d2 + state.md2 * depthRatio;
-    _centerPos.x = _centerPos.y = 0;
-    _centerPos.z = DEPTH * depthRatio;
+    _centerPos = vec3(0, 0, DEPTH * depthRatio);
     _centerPos.rollY(_d1);
     _centerPos.rollX(_d2);
-    _centerPos.x += prevSlice.centerPos.x;
-    _centerPos.y += prevSlice.centerPos.y;
-    _centerPos.z += prevSlice.centerPos.z;
+    _centerPos += prevSlice.centerPos;
     pointRatio = 1 + (fabs(depthRatio) - 1) * 0.02f;
     _pointFrom = prevSlice.pointFrom + state.mp * depthRatio;
     _pointFrom %= state.pointNum;
@@ -541,23 +526,17 @@ public class Slice {
   public void setPointPos() {
     float d = 0, md = PI * 2 / (_state.pointNum - 1);
     foreach (vec3 pp; pointPos) {
-      radOfs.x = 0;
-      radOfs.y = _state.rad * Tunnel.RAD_RATIO;
-      radOfs.z = 0;
+      radOfs = vec3(0, _state.rad * Tunnel.RAD_RATIO, 0);
       radOfs.rollZ(d);
       radOfs.rollY(_d1);
       radOfs.rollX(_d2);
-      pp.x = radOfs.x + _centerPos.x;
-      pp.y = radOfs.y + _centerPos.y;
-      pp.z = radOfs.z + _centerPos.z;
+      pp = radOfs + _centerPos;
       d += md;
     }
   }
 
   private void drawSideLight(float deg, float lightBn) {
-    radOfs.x = 0;
-    radOfs.y = _state.rad;
-    radOfs.z = 0;
+    radOfs = vec3(0, _state.rad, 0);
     radOfs.rollZ(deg);
     radOfs.rollY(_d1);
     radOfs.rollX(_d2);

@@ -117,8 +117,7 @@ public class Enemy: Actor {
         }
       }
     }
-    ppos.x = pos.x;
-    ppos.y = pos.y;
+    ppos = pos;
     if (ship.isBossModeEnd) {
       speed += (0 - speed) * 0.05f;
       flipMvCnt = 0;
@@ -232,16 +231,14 @@ public class Enemy: Actor {
       }
     }
     if (topBullet) {
-      topBullet.bullet.pos.x = pos.x;
-      topBullet.bullet.pos.y = pos.y;
+      topBullet.bullet.pos = pos;
       checkBulletInRange(topBullet);
       float d;
       int i = 0;
       if (bitBullet) {
         foreach (BulletActor bb; bitBullet) {
           spec.getBitOffset(bitOffset, d, i, bitCnt);
-          bb.bullet.pos.x = bitOffset.x + pos.x;
-          bb.bullet.pos.y = bitOffset.y + pos.y;
+          bb.bullet.pos = bitOffset + pos;
           bb.bullet.deg = d;
           checkBulletInRange(bb);
           i++;

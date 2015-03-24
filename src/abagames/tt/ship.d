@@ -137,9 +137,9 @@ public class Ship: BulletTarget {
     rand.setSeed(seed);
     grade = grd;
     tunnelOfs = 0;
-    _pos.x = _pos.y = 0;
-    _relPos.x = _relPos.y = 0;
-    _eyePos.x = _eyePos.y = 0;
+    _pos = vec2(0);
+    _relPos = vec2(0);
+    _eyePos = vec2(0);
     bank = 0;
     _speed = 0;
     d1 = d2 = 0;
@@ -236,9 +236,7 @@ public class Ship: BulletTarget {
     tunnel.setSlices();
     tunnel.setSlicesBackward();
     vec3 sp = tunnel.getPos(_relPos);
-    pos3.x = sp.x;
-    pos3.y = sp.y;
-    pos3.z = sp.z;
+    pos3 = sp;
 
     if (dir & Pad.Dir.RIGHT)
       bank += (-bankMax - bank) * 0.1f;
@@ -408,36 +406,24 @@ public class Ship: BulletTarget {
   }
 
   public void setEyepos() {
-    float ex, ey, ez;
-    float lx, ly, lz;
+    vec3 e;
+    vec3 l;
     float deg;
     if (!replayMode || !cameraMode) {
       epos.x = _eyePos.x;
       epos.y = -1.1f;
       epos.y += _relPos.y * 0.3f;
       epos.z = 30.0f;
-      vec3 ep3 = tunnel.getPos(epos);
-      ex = ep3.x;
-      ey = ep3.y;
-      ez = ep3.z;
+      e = tunnel.getPos(epos);
       epos.x = _eyePos.x;
       epos.y += 6.0f;
       epos.y += _relPos.y * 0.3f;
       epos.z = 0;
-      vec3 lp3 = tunnel.getPos(epos);
-      lx = lp3.x;
-      ly = lp3.y;
-      lz = lp3.z;
+      l = tunnel.getPos(epos);
       deg = _eyePos.x;
     } else {
-      vec3 ep3 = tunnel.getPos(camera.cameraPos);
-      ex = ep3.x;
-      ey = ep3.y;
-      ez = ep3.z;
-      vec3 lp3 = tunnel.getPos(camera.lookAtPos);
-      lx = lp3.x;
-      ly = lp3.y;
-      lz = lp3.z;
+      e = tunnel.getPos(camera.cameraPos);
+      l = tunnel.getPos(camera.lookAtPos);
       deg = camera.deg;
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
@@ -453,15 +439,11 @@ public class Ship: BulletTarget {
       float mx = rand.nextSignedFloat(screenShakeIntense * (screenShakeCnt + 6));
       float my = rand.nextSignedFloat(screenShakeIntense * (screenShakeCnt + 6));
       float mz = rand.nextSignedFloat(screenShakeIntense * (screenShakeCnt + 6));
-      ex += mx;
-      ey += my;
-      ez += mz;
-      lx += mx;
-      ly += my;
-      lz += mz;
+      vec3 m = vec3(mx, my, mz);
+      e += m;
+      l += m;
     }
-    mat4 mat = mat4.look_at(vec3(ex, ey, ez),
-                            vec3(lx, ly, lz),
+    mat4 mat = mat4.look_at(e, l,
                             vec3(sin(deg), -cos(deg), 0));
     mat.transpose();
 
@@ -476,29 +458,27 @@ public class Ship: BulletTarget {
   public bool checkBulletHit(vec2 p, vec2 pp) {
     if (cnt <= 0)
       return false;
-    float bmvx, bmvy, inaa;
-    bmvx = pp.x;
-    bmvy = pp.y;
-    bmvx -= p.x;
-    bmvy -= p.y;
-    if (bmvx > PI)
-      bmvx -= PI * 2;
-    else if (bmvx < -PI)
-      bmvx += PI * 2;
-    inaa = bmvx * bmvx + bmvy * bmvy;
+    vec2 bmv;
+    float inaa;
+    bmv = pp;
+    bmv -= p;
+    if (bmv.x > PI)
+      bmv.x -= PI * 2;
+    else if (bmv.x < -PI)
+      bmv.x += PI * 2;
+    inaa = bmv * bmv;
     if (inaa > 0.00001) {
-      float sofsx, sofsy, inab, hd;
-      sofsx = _relPos.x;
-      sofsy = _relPos.y;
-      sofsx -= p.x;
-      sofsy -= p.y;
-      if (sofsx > PI)
-        sofsx -= PI * 2;
-      else if (sofsx < -PI)
-        sofsx += PI * 2;
-      inab = bmvx * sofsx + bmvy * sofsy;
+      vec2 sofs;
+      float inab, hd;
+      sofs = _relPos;
+      sofs -= p;
+      if (sofs.x > PI)
+        sofs.x -= PI * 2;
+      else if (sofs.x < -PI)
+        sofs.x += PI * 2;
+      inab = bmv * sofs;
       if (inab >= 0 && inab <= inaa) {
-        hd = sofsx * sofsx + sofsy * sofsy - inab * inab / inaa;
+        hd = sofs * sofs - inab * inab / inaa;
         if (hd >= 0 && hd <= HIT_WIDTH) {
           destroyed();
           return true;

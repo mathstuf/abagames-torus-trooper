@@ -43,9 +43,7 @@ public class FloatLetter: Actor {
   }
 
   public void set(string m, vec2 p, float s, int c = 120) {
-    pos.x = p.x;
-    pos.y = p.y;
-    pos.z = 1;
+    pos = vec3(p, 1);
     mx = rand.nextSignedFloat(0.001);
     my = -rand.nextFloat(0.2) + 0.2f;
     d = p.x;
