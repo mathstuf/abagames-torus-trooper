@@ -17,7 +17,7 @@ add_library(tt_util_sdl STATIC
     ${util_sdl_srcs})
 target_link_libraries(tt_util_sdl
     tt_util
-    Derelict::opengl3
+    tt_util_support
     Derelict::sdl2
     Derelict::util)
 set_target_properties(tt_util_sdl

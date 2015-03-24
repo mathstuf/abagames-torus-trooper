@@ -17,5 +17,6 @@ set_target_properties(tt_util
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+add_subdirectory(support)
 add_subdirectory(bulletml)
 add_subdirectory(sdl)

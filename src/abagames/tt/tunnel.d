@@ -5,11 +5,11 @@
  */
 module abagames.tt.tunnel;
 
-private import derelict.opengl3.gl;
 private import std.math;
 private import gl3n.linalg;
 private import abagames.util.math;
 private import abagames.util.rand;
+private import abagames.util.support.gl;
 private import abagames.util.sdl.displaylist;
 private import abagames.tt.ship;
 private import abagames.tt.enemy;

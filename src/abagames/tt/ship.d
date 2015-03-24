@@ -6,9 +6,9 @@
 module abagames.tt.ship;
 
 private import std.math;
-private import derelict.opengl3.gl;
 private import gl3n.linalg;
 private import abagames.util.rand;
+private import abagames.util.support.gl;
 private import abagames.util.sdl.pad;
 private import abagames.util.sdl.recordablepad;
 private import abagames.util.bulletml.bullet;

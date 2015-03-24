@@ -6,11 +6,11 @@
 module abagames.tt.gamemanager;
 
 private import std.math;
-private import derelict.opengl3.gl;
 private import derelict.sdl2.sdl;
 private import bml = bulletml.bulletml;
 private import gl3n.linalg;
 private import abagames.util.rand;
+private import abagames.util.support.gl;
 private import abagames.util.bulletml.bullet;
 private import abagames.util.sdl.gamemanager;
 private import abagames.util.sdl.texture;

@@ -27,7 +27,7 @@ target_link_libraries(tt
     tt_util
     tt_util_bulletml
     tt_util_sdl
-    Derelict::opengl3
+    tt_util_support
     Derelict::sdl2
     Derelict::util)
 set_target_properties(tt

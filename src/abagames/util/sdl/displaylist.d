@@ -5,7 +5,7 @@
  */
 module abagames.util.sdl.displaylist;
 
-private import derelict.opengl3.gl;
+private import abagames.util.support.gl;
 private import abagames.util.sdl.sdlexception;
 
 /**

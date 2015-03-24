@@ -6,12 +6,12 @@
 module abagames.tt.enemy;
 
 private import std.math;
-private import derelict.opengl3.gl;
 private import bml = bulletml.bulletml;
 private import gl3n.linalg;
 private import abagames.util.actor;
 private import abagames.util.math;
 private import abagames.util.rand;
+private import abagames.util.support.gl;
 private import abagames.tt.shape;
 private import abagames.tt.tunnel;
 private import abagames.tt.bulletactor;

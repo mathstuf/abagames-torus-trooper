@@ -6,10 +6,10 @@
 module abagames.tt.floatletter;
 
 private import std.math;
-private import derelict.opengl3.gl;
 private import gl3n.linalg;
 private import abagames.util.actor;
 private import abagames.util.rand;
+private import abagames.util.support.gl;
 private import abagames.tt.letter;
 private import abagames.tt.tunnel;
 private import abagames.tt.screen;

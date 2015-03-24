@@ -7,10 +7,10 @@ module abagames.tt.bulletactor;
 
 private import std.math;
 private import std.c.stdarg;
-private import derelict.opengl3.gl;
 private import bml = bulletml.bulletml;
 private import gl3n.linalg;
 private import abagames.util.actor;
+private import abagames.util.support.gl;
 private import abagames.util.bulletml.bullet;
 private import abagames.tt.bulletimpl;
 private import abagames.tt.bullettarget;

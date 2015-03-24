@@ -6,9 +6,9 @@
 module abagames.tt.title;
 
 private import std.math;
-private import derelict.opengl3.gl;
 private import gl3n.linalg;
 private import abagames.util.math;
+private import abagames.util.support.gl;
 private import abagames.util.sdl.displaylist;
 private import abagames.util.sdl.texture;
 private import abagames.util.sdl.pad;

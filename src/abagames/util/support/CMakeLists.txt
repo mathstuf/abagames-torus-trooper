@@ -1,0 +1,16 @@
+set(util_support_srcs
+    gl.d)
+
+add_library(tt_util_support STATIC
+    ${util_support_srcs})
+target_link_libraries(tt_util_support
+    Derelict::${gl_impl})
+if (TORUS_TROOPER_ANDROID)
+    target_link_libraries(tt_util_support
+        Derelict::sdl2)
+endif ()
+set_target_properties(tt_util_support
+    PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

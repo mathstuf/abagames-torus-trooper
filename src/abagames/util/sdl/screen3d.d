@@ -8,8 +8,8 @@ module abagames.util.sdl.screen3d;
 private import std.conv;
 private import std.string;
 private import derelict.sdl2.sdl;
-private import derelict.opengl3.gl;
 private import gl3n.linalg;
+private import abagames.util.support.gl;
 private import abagames.util.sdl.screen;
 private import abagames.util.sdl.sdlexception;
 
