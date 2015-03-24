@@ -691,7 +691,7 @@ public class Torus {
   public SliceState getSliceState(size_t idx) {
     TorusPart tp = getTorusPart(idx);
     size_t prvTpIdx = tpIdx - 1;
-    if (prvTpIdx < 0)
+    if (prvTpIdx < 0 || tpIdx == 0)
       prvTpIdx = torusPart.length - 1;
     SliceState ss = tp.createBlendedSliceState(torusPart[prvTpIdx].sliceState, idx);
     return ss;
