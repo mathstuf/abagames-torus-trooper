@@ -344,7 +344,7 @@ public class Tunnel {
     return torus.sliceNum;
   }
 
-  public void draw() {
+  public void draw(mat4 view) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     float lineBn = 0.4, polyBn = 0, lightBn = 0.5 - Slice.darkLineRatio * 0.2f;
     slice[slice.length - 1].setPointPos();
@@ -372,7 +372,7 @@ public class Tunnel {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   }
 
-  public void drawBackward() {
+  public void drawBackward(mat4 view) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     float lineBn = 0.4, polyBn = 0, lightBn = 0.5 - Slice.darkLineRatio * 0.2f;
     sliceBackward[sliceBackward.length - 1].setPointPos();

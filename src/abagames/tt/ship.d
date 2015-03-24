@@ -6,6 +6,7 @@
 module abagames.tt.ship;
 
 private import std.math;
+private import std.typecons;
 private import gl3n.linalg;
 private import abagames.util.rand;
 private import abagames.util.support.gl;
@@ -405,10 +406,11 @@ public class Ship: BulletTarget {
     return _relPos;
   }
 
-  public void setEyepos() {
+  public Tuple!(mat4, mat4) setEyepos() {
     vec3 e;
     vec3 l;
     float deg;
+    mat4 view = mat4.identity;
     if (!replayMode || !cameraMode) {
       epos.x = _eyePos.x;
       epos.y = -1.1f;
@@ -428,11 +430,16 @@ public class Ship: BulletTarget {
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
       float np = Screen.nearPlane * camera.zoom;
+      const float ratio = cast(GLfloat) Screen.height / cast(GLfloat) Screen.width;
       glFrustum(-np,
                 np,
-                -np * cast(GLfloat) Screen.height / cast(GLfloat) Screen.width,
-                np * cast(GLfloat) Screen.height / cast(GLfloat) Screen.width,
+                -np * ratio,
+                np * ratio,
                 0.1f, Screen.farPlane);
+      view = mat4.perspective(
+          -np, np,
+          -np * ratio, np * ratio,
+          0.1f, Screen.farPlane);
       glMatrixMode(GL_MODELVIEW);
     }
     if (screenShakeCnt > 0) {
@@ -445,9 +452,13 @@ public class Ship: BulletTarget {
     }
     mat4 mat = mat4.look_at(e, l,
                             vec3(sin(deg), -cos(deg), 0));
+    mat4 model = mat;
     mat.transpose();
 
     glMultMatrixf(mat.value_ptr);
+
+    alias Matrices = Tuple!(mat4, mat4);
+    return Matrices(view, model);
   }
 
   public void setScreenShake(int cnt, float its) {
@@ -562,7 +573,7 @@ public class Ship: BulletTarget {
     gameState.clearVisibleBullets();
   }
 
-  public void draw() {
+  public void draw(mat4 view) {
     if (cnt < -INVINCIBLE_CNT || (cnt < 0 && (-cnt % 32) < 16))
       return;
     glPushMatrix();
@@ -570,20 +581,20 @@ public class Ship: BulletTarget {
     glRotatef((pos.x - bank) * 180 / PI, 0, 0, 1);
     glRotatef(d1 * 180 / PI, 0, 1, 0);
     glRotatef(d2 * 180 / PI, 1, 0, 0);
-    _shape.draw();
+    _shape.draw(view);
     glPopMatrix();
   }
 
-  public void drawFront() {
-    Letter.drawNum(cast(int) (speed * 2500), 490, 420, 20);
-    Letter.drawString("KM/H", 540, 445, 12);
-    Letter.drawNum(rank, 150, 432, 16);
-    Letter.drawString("/", 185, 448, 10);
-    Letter.drawNum(zoneEndRank - rank, 250, 448, 10);
-    /*Letter.drawString("LAP", 20, 388, 8, Letter.Direction.TO_RIGHT, 1);
-    Letter.drawNum(lap, 120, 388, 8);
-    Letter.drawString(".", 130, 386, 8);
-    Letter.drawNum(cast(int) (pos.y * 1000000 / tunnel.getTorusLength()), 230, 388, 8,
+  public void drawFront(mat4 view) {
+    Letter.drawNum(view, cast(int) (speed * 2500), 490, 420, 20);
+    Letter.drawString(view, "KM/H", 540, 445, 12);
+    Letter.drawNum(view, rank, 150, 432, 16);
+    Letter.drawString(view, "/", 185, 448, 10);
+    Letter.drawNum(view, zoneEndRank - rank, 250, 448, 10);
+    /*Letter.drawString(view, "LAP", 20, 388, 8, Letter.Direction.TO_RIGHT, 1);
+    Letter.drawNum(view, lap, 120, 388, 8);
+    Letter.drawString(view, ".", 130, 386, 8);
+    Letter.drawNum(view, cast(int) (pos.y * 1000000 / tunnel.getTorusLength()), 230, 388, 8,
                    Letter.Direction.TO_RIGHT, 0, 6);*/
   }
 

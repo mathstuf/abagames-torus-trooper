@@ -154,24 +154,24 @@ public class Particle: LuminousActor {
       inCourse = false;
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     switch (type) {
     case PType.SPARK:
     case PType.JET:
-      drawSpark();
+      drawSpark(view);
       break;
     case PType.STAR:
-      drawStar();
+      drawStar(view);
       break;
     case PType.FRAGMENT:
-      drawFragment();
+      drawFragment(view);
       break;
     default:
       assert(0);
     }
   }
 
-  private void drawSpark() {
+  private void drawSpark(mat4 view) {
     glBegin(GL_TRIANGLE_FAN);
     Screen.setColor(r, g, b, 0.5);
     Screen.glVertex(psp);
@@ -196,7 +196,7 @@ public class Particle: LuminousActor {
     }
   }
 
-  private void drawStar() {
+  private void drawStar(mat4 view) {
     glBegin(GL_LINES);
     Screen.setColor(r, g, b, 1);
     Screen.glVertex(psp);
@@ -205,7 +205,7 @@ public class Particle: LuminousActor {
     glEnd();
   }
 
-  private void drawFragment() {
+  private void drawFragment(mat4 view) {
     glPushMatrix();
     glTranslatef(sp.x, sp.y, sp.z);
     glRotatef(d1, 0, 0, 1);
@@ -227,7 +227,7 @@ public class Particle: LuminousActor {
     glPopMatrix();
   }
 
-  public override void drawLuminous() {
+  public override void drawLuminous(mat4 view) {
     if (lumAlp < 0.2 || type != PType.SPARK) return;
     glBegin(GL_TRIANGLE_FAN);
     Screen.setColor(r, g, b, lumAlp * 0.6);

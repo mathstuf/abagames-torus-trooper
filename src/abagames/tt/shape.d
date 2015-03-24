@@ -20,7 +20,7 @@ private import abagames.tt.particle;
  * Interface for drawing a shape.
  */
 public interface Drawable {
-  public void draw();
+  public void draw(mat4 view);
 }
 
 /**
@@ -327,7 +327,7 @@ public class ShipShape: Collidable, Drawable {
     }
   }
 
-  public void draw() {
+  public void draw(mat4 view) {
     displayList.call(0);
   }
 
@@ -538,7 +538,7 @@ public class BitShape: Drawable {
     displayList.close();
   }
 
-  public void draw() {
+  public void draw(mat4 view) {
     displayList.call(0);
   }
 }
@@ -726,7 +726,7 @@ public class BulletShape: Drawable {
     }
   }
 
-  public void draw() {
+  public void draw(mat4 view) {
     displayList.call(0);
   }
 }
@@ -787,7 +787,7 @@ public class ShotShape: Collidable, Drawable {
     displayList.close();
   }
 
-  public void draw() {
+  public void draw(mat4 view) {
     displayList.call(0);
   }
 
@@ -806,9 +806,9 @@ public class ResizableDrawable: Collidable, Drawable {
   float _size;
   vec2 _collision;
 
-  public void draw() {
+  public void draw(mat4 view) {
     glScalef(_size, _size, _size);
-    _shape.draw();
+    _shape.draw(view);
   }
 
   public Drawable shape(Drawable v) {

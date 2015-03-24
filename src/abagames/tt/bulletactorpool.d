@@ -106,10 +106,10 @@ public class BulletActorPool: ActorPool!(BulletActor), BulletsManager {
     cnt++;
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     foreach (BulletActor ba; actor)
       if (ba.exists)
-        ba.draw();
+        ba.draw(view);
   }
 
   public int getTurn() {

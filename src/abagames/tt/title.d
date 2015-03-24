@@ -174,7 +174,7 @@ public class TitleManager {
     _replayChangeRatio = cast(float) replayCnt / REPLAY_CHANGE_DURATION;
   }
 
-  public void draw() {
+  public void draw(mat4 view) {
     if (_replayChangeRatio >= 1.0f)
       return;
     glPopMatrix();
@@ -213,7 +213,7 @@ public class TitleManager {
     glPopMatrix();
   }
 
-  public void drawFront() {
+  public void drawFront(mat4 view) {
     if (_replayChangeRatio > 0)
       return;
     glPushMatrix();
@@ -243,14 +243,14 @@ public class TitleManager {
       glLineWidth(2);
       calcCursorPos(cx, cy, i, 1);
       drawCursorRing(cx, cy, 15);
-      Letter.drawString(Ship.GRADE_LETTER[i], cx - 4, cy - 10, 7);
+      Letter.drawString(view, Ship.GRADE_LETTER[i], cx - 4, cy - 10, 7);
       glLineWidth(1);
       int ml = prefManager.prefData.getMaxLevel(i);
       if (ml > 1) {
         float ecx, ecy;
         calcCursorPos(ecx, ecy, i, ml);
         drawCursorRing(ecx, ecy, 15);
-        Letter.drawNum(ml, ecx + 7, ecy - 8, 6);
+        Letter.drawNum(view, ml, ecx + 7, ecy - 8, 6);
         float l2cx, l2cy;
         calcCursorPos(l2cx, l2cy, i, 2);
         glBegin(GL_LINES);
@@ -265,15 +265,15 @@ public class TitleManager {
         glEnd();
       }
     }
-    Letter.drawString(Ship.GRADE_STR[grade],
+    Letter.drawString(view, Ship.GRADE_STR[grade],
                       560 - Ship.GRADE_STR[grade].length * 19, 4, 9);
-    Letter.drawNum(level, 620, 10, 6);
-    Letter.drawString("LV", 570, 10, 6);
+    Letter.drawNum(view, level, 620, 10, 6);
+    Letter.drawString(view, "LV", 570, 10, 6);
     GradeData gd = prefManager.prefData.getGradeData(grade);
-    Letter.drawNum(gd.hiScore, 620, 45, 8);
-    Letter.drawNum(gd.startLevel, 408, 54, 5);
-    Letter.drawNum(gd.endLevel, 453, 54, 5);
-    Letter.drawString("-", 423, 54, 5);
+    Letter.drawNum(view, gd.hiScore, 620, 45, 8);
+    Letter.drawNum(view, gd.startLevel, 408, 54, 5);
+    Letter.drawNum(view, gd.endLevel, 453, 54, 5);
+    Letter.drawString(view, "-", 423, 54, 5);
     calcCursorPos(cx, cy, grade, level);
     drawCursorRing(cx, cy, 18 + sin(cnt * 0.1f) * 3);
   }

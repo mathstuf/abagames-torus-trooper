@@ -8,6 +8,7 @@ module abagames.util.sdl.luminous;
 private import std.math;
 private import std.c.string;
 private import std.string;
+private import gl3n.linalg;
 private import abagames.util.actor;
 private import abagames.util.support.gl;
 
@@ -85,7 +86,7 @@ public class LuminousScreen {
   private static float[2][2] lmOfs = [[-2, -1], [2, 1]];
   private static const float lmOfsBs = 3;
 
-  public void draw() {
+  public void draw(mat4 view) {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, luminousTexture);
     viewOrtho();
@@ -113,7 +114,7 @@ public class LuminousScreen {
  * Actor with the luminous effect.
  */
 public class LuminousActor: Actor {
-  public abstract void drawLuminous();
+  public abstract void drawLuminous(mat4 view);
 }
 
 /**
@@ -124,9 +125,9 @@ public class LuminousActorPool(T): ActorPool!(T) {
     createActors(n, args);
   }
 
-  public void drawLuminous() {
+  public void drawLuminous(mat4 view) {
     for (int i = 0; i < actor.length; i++)
       if (actor[i].exists)
-        actor[i].drawLuminous();
+        actor[i].drawLuminous(view);
   }
 }

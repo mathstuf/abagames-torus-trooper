@@ -6,6 +6,7 @@
 module abagames.tt.gamemanager;
 
 private import std.math;
+private import std.typecons;
 private import derelict.sdl2.sdl;
 private import bml = bulletml.bulletml;
 private import gl3n.linalg;
@@ -57,9 +58,10 @@ public class GameManager: abagames.util.sdl.gamemanager.GameManager {
   GameState state;
   TitleState titleState;
   InGameState inGameState;
+  mat4 windowmat;
   bool escPressed;
 
-  public override void init() {
+  public override void init(mat4 windowmat) {
     BarrageManager.load();
     Letter.init();
     Shot.init();
@@ -112,6 +114,8 @@ public class GameManager: abagames.util.sdl.gamemanager.GameManager {
                                 pad, titleManager, passedEnemies, inGameState);
     inGameState.seed = rand.nextInt32();
     ship.setGameState(inGameState);
+
+    this.windowmat = windowmat;
   }
 
   public override void start() {
@@ -190,23 +194,24 @@ public class GameManager: abagames.util.sdl.gamemanager.GameManager {
       Sint32 w = we.data1;
       Sint32 h = we.data2;
       if (w > 150 && h > 100)
-        screen.resized(w, h);
+        windowmat = screen.resized(w, h);
     }
     if (screen.startRenderToLuminousScreen()) {
       glPushMatrix();
-      ship.setEyepos();
-      state.drawLuminous();
+      Tuple!(mat4, mat4) mats = ship.setEyepos();
+      state.drawLuminous(windowmat * mats[0] * mats[1]);
       glPopMatrix();
       screen.endRenderToLuminousScreen();
     }
     screen.clear();
     glPushMatrix();
-    ship.setEyepos();
-    state.draw();
+    Tuple!(mat4, mat4) mats = ship.setEyepos();
+    mat4 view = windowmat * mats[0];
+    state.draw(view * mats[1]);
     glPopMatrix();
-    screen.drawLuminous();
-    screen.viewOrthoFixed();
-    state.drawFront();
+    screen.drawLuminous(view);
+    mat4 orthoView = screen.viewOrthoFixed();
+    state.drawFront(orthoView);
     screen.viewPerspective();
   }
 }
@@ -244,9 +249,9 @@ public class GameState {
 
   public abstract void start();
   public abstract void move();
-  public abstract void draw();
-  public abstract void drawLuminous();
-  public abstract void drawFront();
+  public abstract void draw(mat4 view);
+  public abstract void drawLuminous(mat4 view);
+  public abstract void drawFront(mat4 view);
 
 
   public float level(float v) {
@@ -428,43 +433,43 @@ public class InGameState: GameState {
         ship.isGameOver = true;
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     glEnable(GL_CULL_FACE);
-    tunnel.draw();
+    tunnel.draw(view);
     glDisable(GL_CULL_FACE);
-    particles.draw();
-    enemies.draw();
-    ship.draw();
+    particles.draw(view);
+    enemies.draw(view);
+    ship.draw(view);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    floatLetters.draw();
+    floatLetters.draw(view);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glDisable(GL_BLEND);
-    bullets.draw();
+    bullets.draw(view);
     glEnable(GL_BLEND);
-    shots.draw();
+    shots.draw(view);
   }
 
-  public override void drawLuminous() {
-    particles.drawLuminous();
+  public override void drawLuminous(mat4 view) {
+    particles.drawLuminous(view);
   }
 
-  public override void drawFront() {
-    ship.drawFront();
-    Letter.drawNum(score, 610, 0, 15);
-    Letter.drawString("/", 510, 40, 7);
-    Letter.drawNum(nextExtend - score, 615, 40, 7);
+  public override void drawFront(mat4 view) {
+    ship.drawFront(view);
+    Letter.drawNum(view, score, 610, 0, 15);
+    Letter.drawString(view, "/", 510, 40, 7);
+    Letter.drawNum(view, nextExtend - score, 615, 40, 7);
     if (time > BEEP_START_TIME)
-      Letter.drawTime(time, 220, 24, 15);
+      Letter.drawTime(view, time, 220, 24, 15);
     else
-      Letter.drawTime(time, 220, 24, 15, 1);
+      Letter.drawTime(view, time, 220, 24, 15, 1);
     if (timeChangedShowCnt >= 0 && (timeChangedShowCnt % 64) > 32)
-      Letter.drawString(timeChangedMsg, 250, 24, 7, Letter.Direction.TO_RIGHT, 1);
-    Letter.drawString("LEVEL", 20, 410, 8, Letter.Direction.TO_RIGHT, 1);
-    Letter.drawNum(cast(int) stageManager.level, 135, 410, 8);
+      Letter.drawString(view, timeChangedMsg, 250, 24, 7, Letter.Direction.TO_RIGHT, 1);
+    Letter.drawString(view, "LEVEL", 20, 410, 8, Letter.Direction.TO_RIGHT, 1);
+    Letter.drawNum(view, cast(int) stageManager.level, 135, 410, 8);
     if (ship.isGameOver)
-      Letter.drawString("GAME OVER", 140, 180, 20);
+      Letter.drawString(view, "GAME OVER", 140, 180, 20);
     if (pauseCnt > 0 && (pauseCnt % 64) < 32)
-      Letter.drawString("PAUSE", 240, 185, 17);
+      Letter.drawString(view, "PAUSE", 240, 185, 17);
   }
 
   public void shipDestroyed() {
@@ -624,7 +629,7 @@ public class TitleState: GameState {
     }
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     if (replayData) {
       float rcr = titleManager.replayChangeRatio * 2.4f;
       if (rcr > 1)
@@ -633,40 +638,33 @@ public class TitleState: GameState {
                  cast(int) (Screen.width / 4 * (3 + rcr)),
                  Screen.height);
       glEnable(GL_CULL_FACE);
-      tunnel.draw();
-      tunnel.drawBackward();
+      tunnel.draw(view);
+      tunnel.drawBackward(view);
       glDisable(GL_CULL_FACE);
-      particles.draw();
-      enemies.draw();
-      passedEnemies.draw();
-      ship.draw();
+      particles.draw(view);
+      enemies.draw(view);
+      passedEnemies.draw(view);
+      ship.draw(view);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      floatLetters.draw();
+      floatLetters.draw(view);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE);
       glDisable(GL_BLEND);
-      bullets.draw();
+      bullets.draw(view);
       glEnable(GL_BLEND);
-      shots.draw();
+      shots.draw(view);
     }
-    glViewport(0, 0, Screen.width, Screen.height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(-Screen.nearPlane,
-              Screen.nearPlane,
-              -Screen.nearPlane * cast(GLfloat) Screen.height / cast(GLfloat) Screen.width,
-              Screen.nearPlane * cast(GLfloat) Screen.height / cast(GLfloat) Screen.width,
-              0.1f, Screen.farPlane);
-    glMatrixMode(GL_MODELVIEW);
-    titleManager.draw();
+
+    mat4 titleView = Screen.screenResized();
+    titleManager.draw(titleView);
   }
 
-  public override void drawLuminous() {
+  public override void drawLuminous(mat4 view) {
   }
 
-  public override void drawFront() {
-    titleManager.drawFront();
+  public override void drawFront(mat4 view) {
+    titleManager.drawFront(view);
     if (!ship.drawFrontMode || titleManager.replayChangeRatio < 1)
       return;
-    inGameState.drawFront();
+    inGameState.drawFront(view);
   }
 }

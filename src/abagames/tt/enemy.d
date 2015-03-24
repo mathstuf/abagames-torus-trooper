@@ -349,7 +349,7 @@ public class Enemy: Actor {
     exists = false;
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     vec3 sp = tunnel.getPos(pos);
     glPushMatrix();
     Screen.glTranslate(sp);
@@ -361,9 +361,9 @@ public class Enemy: Actor {
     glRotatef(d1 * 180 / PI, 0, 1, 0);
     glRotatef(d2 * 180 / PI, 1, 0, 0);
     if (!damaged)
-      spec.shape.draw();
+      spec.shape.draw(view);
     else
-      spec.damagedShape.draw();
+      spec.damagedShape.draw(view);
     glPopMatrix();
     if (bitBullet) {
       foreach (BulletActor bb; bitBullet) {
@@ -372,7 +372,7 @@ public class Enemy: Actor {
         Screen.glTranslate(sp);
         glRotatef(bitCnt * 7, 0, 1, 0);
         glRotatef(pos.x * 180 / PI, 0, 0, 1);
-        ShipSpec.bitShape.draw();
+        ShipSpec.bitShape.draw(view);
         glPopMatrix();
       }
     }

@@ -6,6 +6,7 @@
 module abagames.util.sdl.mainloop;
 
 private import derelict.sdl2.sdl;
+private import gl3n.linalg;
 private import abagames.util.logger;
 private import abagames.util.rand;
 private import abagames.util.prefmanager;
@@ -44,7 +45,7 @@ public class MainLoop {
   }
 
   // Initialize and load preference.
-  private void initFirst() {
+  private void initFirst(mat4 windowmat) {
     prefManager.load();
     try {
       SoundManager.init();
@@ -54,7 +55,7 @@ public class MainLoop {
     try {
       (cast(Pad) input).openJoystick();
     } catch (Exception e) {}
-    gameManager.init();
+    gameManager.init(windowmat);
   }
 
   // Quit and save preference.
@@ -79,8 +80,8 @@ public class MainLoop {
     long nowTick;
     int frame;
 
-    screen.initSDL();
-    initFirst();
+    mat4 windowmat = screen.initSDL();
+    initFirst(windowmat);
     gameManager.start();
 
     while (!done) {

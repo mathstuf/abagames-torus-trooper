@@ -65,14 +65,14 @@ public class FloatLetter: Actor {
       alpha -= 0.03f;
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     glPushMatrix();
     vec3 sp = tunnel.getPos(pos);
     glTranslatef(0, 0, sp.z);
     Screen.setColor(1, 1, 1, 1);
-    Letter.drawString(msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 2, false, d  * 180 / PI);
+    Letter.drawString(view, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 2, false, d  * 180 / PI);
     Screen.setColor(1, 1, 1, alpha);
-    Letter.drawString(msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 3, false, d  * 180 / PI);
+    Letter.drawString(view, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 3, false, d  * 180 / PI);
     glPopMatrix();
   }
 }

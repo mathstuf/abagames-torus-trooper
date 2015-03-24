@@ -220,7 +220,7 @@ public class BulletActor: Actor {
     }
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     if (!isVisible)
       return;
     float d = (bullet.deg * bullet.xReverse + PI / 2) * bullet.yReverse - PI / 2;
@@ -230,11 +230,11 @@ public class BulletActor: Actor {
     glRotatef(d * 180 / PI, 0, 1, 0);
     glRotatef(cnt * 6, 0, 0, 1);
     if (disapCnt <= 0) {
-      bullet.shape.draw();
+      bullet.shape.draw(view);
     } else {
       float s = 1 - cast(float) disapCnt / DISAP_CNT;
       glScalef(s, s, s);
-      bullet.disapShape.draw();
+      bullet.disapShape.draw(view);
     }
     glPopMatrix();
   }

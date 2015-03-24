@@ -6,6 +6,7 @@
 module abagames.tt.screen;
 
 private import std.math;
+private import gl3n.linalg;
 private import abagames.util.support.gl;
 private import abagames.util.sdl.screen3d;
 private import abagames.util.sdl.luminous;
@@ -60,22 +61,26 @@ public class Screen: Screen3D {
       luminousScreen.endRender();
   }
 
-  public void drawLuminous() {
+  public void drawLuminous(mat4 view) {
     if (luminousScreen)
-      luminousScreen.draw();
+      luminousScreen.draw(view);
   }
 
-  public override void resized(int width, int height) {
+  public override mat4 resized(int width, int height) {
     if (luminousScreen)
       luminousScreen.resized(width, height);
-    super.resized(width, height);
+    return super.resized(width, height);
   }
 
   public override void clear() {
     glClear(GL_COLOR_BUFFER_BIT);
   }
 
-  public static void viewOrthoFixed() {
+  public static mat4 fixedOrthoView() {
+    return mat4.orthographic(0, 640, 480, 0, -1, 1);
+  }
+
+  public static mat4 viewOrthoFixed() {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -83,6 +88,8 @@ public class Screen: Screen3D {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+
+    return fixedOrthoView();
   }
 
   public static void viewPerspective() {

@@ -190,13 +190,13 @@ public class Shot: Actor {
     }
   }
 
-  public override void draw() {
+  public override void draw(mat4 view) {
     vec3 sp = tunnel.getPos(pos);
     glPushMatrix();
     Screen.glTranslate(sp);
     glRotatef(deg * 180 / PI, 0, 1, 10);
     glRotatef(cnt * 7, 0, 0, 1);
-    shape.draw();
+    shape.draw(view);
     glPopMatrix();
   }
 

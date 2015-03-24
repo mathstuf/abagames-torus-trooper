@@ -6,6 +6,7 @@
 module abagames.tt.letter;
 
 private import std.math;
+private import gl3n.linalg;
 private import abagames.util.support.gl;
 private import abagames.util.sdl.displaylist;
 private import abagames.tt.screen;
@@ -30,7 +31,7 @@ public class Letter {
     for (int j = 0; j < COLOR_NUM; j++) {
       for (int i = 0; i < LETTER_NUM; i++) {
         displayList.newList();
-        drawLetter(i, j);
+        drawLetter(mat4.identity, i, j);
         displayList.endList();
       }
     }
@@ -48,7 +49,7 @@ public class Letter {
     return s * LETTER_HEIGHT;
   }
 
-  private static void drawLetter(int n, float x, float y, float s, float d, int c) {
+  private static void drawLetter(mat4 view, int n, float x, float y, float s, float d, int c) {
     glPushMatrix();
     glTranslatef(x, y, 0);
     glScalef(s, s, s);
@@ -57,7 +58,7 @@ public class Letter {
     glPopMatrix();
   }
 
-  private static void drawLetterRev(int n, float x, float y, float s, float d, int c) {
+  private static void drawLetterRev(mat4 view, int n, float x, float y, float s, float d, int c) {
     glPushMatrix();
     glTranslatef(x, y, 0);
     glScalef(s, -s, s);
@@ -94,7 +95,7 @@ public class Letter {
     return idx;
   }
 
-  public static void drawString(string str, float lx, float y, float s,
+  public static void drawString(mat4 view, string str, float lx, float y, float s,
                                 int d = Direction.TO_RIGHT, int cl = 0,
                                 bool rev = false, float od = 0) {
     lx += LETTER_WIDTH * s / 2;
@@ -123,9 +124,9 @@ public class Letter {
       if (c != ' ') {
         idx = convertCharToInt(c);
         if (rev)
-          drawLetterRev(idx, x, y, s, ld, cl);
+          drawLetterRev(view, idx, x, y, s, ld, cl);
         else
-          drawLetter(idx, x, y, s, ld, cl);
+          drawLetter(view, idx, x, y, s, ld, cl);
       }
       if (od == 0) {
         switch(d) {
@@ -151,7 +152,7 @@ public class Letter {
     }
   }
 
-  public static void drawNum(int num, float lx, float y, float s,
+  public static void drawNum(mat4 view, int num, float lx, float y, float s,
                              int d = Direction.TO_RIGHT, int cl = 0, int dg = 0) {
     lx += LETTER_WIDTH * s / 2;
     y += LETTER_HEIGHT * s / 2;
@@ -176,7 +177,7 @@ public class Letter {
     }
     int digit = dg;
     for (;;) {
-      drawLetter(n % 10, x, y, s, ld, cl);
+      drawLetter(view, n % 10, x, y, s, ld, cl);
       switch(d) {
       case Direction.TO_RIGHT:
         x -= s * LETTER_WIDTH;
@@ -200,7 +201,7 @@ public class Letter {
     }
   }
 
-  public static void drawNumSign(int num, float lx, float ly, float s, int cl) {
+  public static void drawNumSign(mat4 view, int num, float lx, float ly, float s, int cl) {
     float dg;
     if (num < 100)
       dg = 2;
@@ -214,7 +215,7 @@ public class Letter {
     float y = ly + LETTER_HEIGHT * s / 2;
     int n = num;
     for (;;) {
-      drawLetterRev(n % 10, x, y, s, 0, cl);
+      drawLetterRev(view, n % 10, x, y, s, 0, cl);
       x -= s * LETTER_WIDTH;
       n /= 10;
       if (n <= 0)
@@ -222,26 +223,26 @@ public class Letter {
     }
   }
 
-  public static void drawTime(int time, float lx, float y, float s, int cl = 0) {
+  public static void drawTime(mat4 view, int time, float lx, float y, float s, int cl = 0) {
     int n = time;
     if (n < 0)
       n = 0;
     float x = lx;
     for (int i = 0; i < 7; i++) {
       if (i != 4) {
-        drawLetter(n % 10, x, y, s, Direction.TO_RIGHT, cl);
+        drawLetter(view, n % 10, x, y, s, Direction.TO_RIGHT, cl);
         n /= 10;
       } else {
-        drawLetter(n % 6, x, y, s, Direction.TO_RIGHT, cl);
+        drawLetter(view, n % 6, x, y, s, Direction.TO_RIGHT, cl);
         n /= 6;
       }
       if ((i & 1) == 1 || i == 0) {
         switch (i) {
         case 3:
-          drawLetter(41, x + s * 1.16f, y, s, Direction.TO_RIGHT, cl);
+          drawLetter(view, 41, x + s * 1.16f, y, s, Direction.TO_RIGHT, cl);
           break;
         case 5:
-          drawLetter(40, x + s * 1.16f, y, s, Direction.TO_RIGHT, cl);
+          drawLetter(view, 40, x + s * 1.16f, y, s, Direction.TO_RIGHT, cl);
           break;
         default:
           break;
@@ -255,7 +256,7 @@ public class Letter {
     }
   }
 
-  private static void drawLetter(int idx, int c) {
+  private static void drawLetter(mat4 view, int idx, int c) {
     float x, y, length, size, t;
     float deg;
     for (int i = 0;; i++) {
@@ -272,52 +273,52 @@ public class Letter {
       y = y;
       deg %= 180;
       if (c == 2)
-        drawBoxLine(x, y, size, length, deg);
+        drawBoxLine(view, x, y, size, length, deg);
       else if (c == 3)
-        drawBoxPoly(x, y, size, length, deg);
+        drawBoxPoly(view, x, y, size, length, deg);
       else
-        drawBox(x, y, size, length, deg,
+        drawBox(view, x, y, size, length, deg,
                 COLOR_RGB[c][0], COLOR_RGB[c][1], COLOR_RGB[c][2]);
     }
   }
 
-  private static void drawBox(float x, float y, float width, float height, float deg,
+  private static void drawBox(mat4 view, float x, float y, float width, float height, float deg,
                               float r, float g, float b) {
     glPushMatrix();
     glTranslatef(x - width / 2, y - height / 2, 0);
     glRotatef(deg, 0, 0, 1);
     Screen.setColor(r, g, b, 0.5);
     glBegin(GL_TRIANGLE_FAN);
-    drawBoxPart(width, height);
+    drawBoxPart(view, width, height);
     glEnd();
     Screen.setColor(r, g, b);
     glBegin(GL_LINE_LOOP);
-    drawBoxPart(width, height);
+    drawBoxPart(view, width, height);
     glEnd();
     glPopMatrix();
   }
 
-  private static void drawBoxLine(float x, float y, float width, float height, float deg) {
+  private static void drawBoxLine(mat4 view, float x, float y, float width, float height, float deg) {
     glPushMatrix();
     glTranslatef(x - width / 2, y - height / 2, 0);
     glRotatef(deg, 0, 0, 1);
     glBegin(GL_LINE_LOOP);
-    drawBoxPart(width, height);
+    drawBoxPart(view, width, height);
     glEnd();
     glPopMatrix();
   }
 
-  private static void drawBoxPoly(float x, float y, float width, float height, float deg) {
+  private static void drawBoxPoly(mat4 view, float x, float y, float width, float height, float deg) {
     glPushMatrix();
     glTranslatef(x - width / 2, y - height / 2, 0);
     glRotatef(deg, 0, 0, 1);
     glBegin(GL_TRIANGLE_FAN);
-    drawBoxPart(width, height);
+    drawBoxPart(view, width, height);
     glEnd();
     glPopMatrix();
   }
 
-  private static void drawBoxPart(float width, float height) {
+  private static void drawBoxPart(mat4 view, float width, float height) {
     glVertex3f(-width / 2, 0, 0);
     glVertex3f(-width / 3 * 1, -height / 2, 0);
     glVertex3f( width / 3 * 1, -height / 2, 0);
