@@ -7,6 +7,7 @@ module abagames.tt.prefmanager;
 
 private import std.stream;
 private import abagames.util.prefmanager;
+private import abagames.util.support.paths;
 private import abagames.tt.ship;
 
 /**
@@ -26,7 +27,10 @@ public class PrefManager: abagames.util.prefmanager.PrefManager {
     scope File fd = new File;
     try {
       int ver;
-      fd.open(PREF_FILE);
+      string path = dataStoragePath();
+      ensureDir(path);
+      path ~= "/" ~ PREF_FILE;
+      fd.open(path);
       fd.read(ver);
       if (ver != VERSION_NUM)
         throw new Error("Wrong version num");
@@ -41,7 +45,10 @@ public class PrefManager: abagames.util.prefmanager.PrefManager {
 
   public void save() {
     scope File fd = new File;
-    fd.create(PREF_FILE);
+    string path = dataStoragePath();
+    ensureDir(path);
+    path ~= "/" ~ PREF_FILE;
+    fd.create(path);
     fd.write(VERSION_NUM);
     _prefData.save(fd);
     fd.close();

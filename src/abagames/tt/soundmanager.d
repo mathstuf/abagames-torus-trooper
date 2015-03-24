@@ -9,6 +9,7 @@ private import std.path;
 private import std.file;
 private import abagames.util.rand;
 private import abagames.util.logger;
+private import abagames.util.support.paths;
 private import abagames.util.sdl.sound;
 
 /**
@@ -43,8 +44,10 @@ public class SoundManager: abagames.util.sdl.sound.SoundManager {
   }
 
   private static Music[] loadMusics() {
+    string dir = assetStoragePath();
+    dir ~= "/" ~ Music.dir;
     Music[] musics;
-    foreach (string filePath; dirEntries(Music.dir, "*.{ogg,wav}", SpanMode.shallow)) {
+    foreach (string filePath; dirEntries(dir, "*.{ogg,wav}", SpanMode.shallow)) {
       string fileName = baseName(filePath);
       Music music = new Music();
       music.load(fileName);

@@ -1,0 +1,59 @@
+/*
+ * $Id: paths.d,v 1.1.1.1 2005/06/18 00:46:00 kenta Exp $
+ *
+ * Copyright 2004 Kenta Cho. Some rights reserved.
+ */
+module abagames.util.support.paths;
+
+version (Android) {
+  private import std.conv;
+  private import derelict.sdl2.sdl;
+} else version (TorusTrooperInstall) {
+  private import std.path;
+  private import std.process;
+}
+private import std.file;
+
+public string dataStoragePath() {
+  version (Android) {
+    return to!string(SDL_AndroidGetExternalStoragePath());
+  } else version (TorusTrooperInstall) {
+    version (Windows) {
+      string basePath = environment.get("APPDATA",
+          environment.get("USERPROFILE", "") ~ "\\Application Data");
+      return basePath ~ "\\torus-trooper\\data";
+    } else {
+      string basePath = environment.get("XDG_DATA_HOME",
+          environment.get("HOME", "") ~ "/.local/share");
+      return basePath ~ dirSeparator ~ "torus-trooper";
+    }
+  } else {
+    return "@CMAKE_SOURCE_DIR@";
+  }
+}
+
+public string assetStoragePath() {
+  version (Android) {
+    return to!string(SDL_AndroidGetInternalStoragePath());
+  } else version (TorusTrooperInstall) {
+    version (Windows) {
+      return "@CMAKE_INSTALL_PREFIX@/share";
+    } else {
+      return "@CMAKE_INSTALL_PREFIX@/share/torus-trooper";
+    }
+  } else {
+    return "@CMAKE_SOURCE_DIR@";
+  }
+}
+
+public void ensureDir(string path) {
+  if (isDir(path)) {
+    return;
+  }
+
+  if (exists(path)) {
+    throw new Exception("Unable to create directory: " ~ path);
+  }
+
+  mkdirRecurse(path);
+}

@@ -9,6 +9,7 @@ private import std.conv;
 private import std.string;
 private import derelict.sdl2.sdl;
 private import derelict.sdl2.mixer;
+private import abagames.util.support.paths;
 private import abagames.util.sdl.sdlexception;
 
 /**
@@ -76,11 +77,12 @@ public class Music: Sound {
   public void load(string name) {
     if (SoundManager.noSound)
       return;
-    string fileName = dir ~ "/" ~ name;
-    music = Mix_LoadMUS(std.string.toStringz(fileName));
+    string path = assetStoragePath() ~ "/" ~ dir;
+    path ~= "/" ~ name;
+    music = Mix_LoadMUS(std.string.toStringz(path));
     if (!music) {
       SoundManager.noSound = true;
-      throw new SDLException("Couldn't load: " ~ fileName ~
+      throw new SDLException("Couldn't load: " ~ path ~
                              " (" ~ to!string(Mix_GetError()) ~ ")");
     }
   }
@@ -145,11 +147,12 @@ public class Chunk: Sound {
   public void load(string name, int ch) {
     if (SoundManager.noSound)
       return;
-    string fileName = dir ~ "/" ~ name;
-    chunk = Mix_LoadWAV(std.string.toStringz(fileName));
+    string path = assetStoragePath() ~ "/" ~ dir;
+    path ~= "/" ~ name;
+    chunk = Mix_LoadWAV(std.string.toStringz(path));
     if (!chunk) {
       SoundManager.noSound = true;
-      throw new SDLException("Couldn't load: " ~ fileName ~
+      throw new SDLException("Couldn't load: " ~ path ~
                              " (" ~ to!string(Mix_GetError()) ~ ")");
     }
     chunkChannel = ch;

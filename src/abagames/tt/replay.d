@@ -6,6 +6,7 @@
 module abagames.tt.replay;
 
 private import std.stream;
+private import abagames.util.support.paths;
 private import abagames.util.sdl.recordablepad;
 
 /**
@@ -23,7 +24,10 @@ public class ReplayData {
 
   public void save(string fileName) {
     scope File fd = new File;
-    fd.create(dir ~ "/" ~ fileName);
+    string path = dataStoragePath() ~ "/" ~ dir;
+    ensureDir(path);
+    path ~= "/" ~ fileName;
+    fd.create(path);
     fd.write(VERSION_NUM);
     fd.write(level);
     fd.write(grade);
@@ -34,7 +38,10 @@ public class ReplayData {
 
   public void load(string fileName) {
     scope File fd = new File;
-    fd.open(dir ~ "/" ~ fileName);
+    string path = dataStoragePath() ~ "/" ~ dir;
+    ensureDir(path);
+    path ~= "/" ~ fileName;
+    fd.open(path);
     int ver;
     fd.read(ver);
     if (ver != VERSION_NUM)

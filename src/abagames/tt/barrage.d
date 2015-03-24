@@ -12,6 +12,7 @@ private import std.file;
 private import bml = bulletml.bulletml;
 private import abagames.util.rand;
 private import abagames.util.logger;
+private import abagames.util.support.paths;
 private import abagames.tt.bulletactor;
 private import abagames.tt.bulletactorpool;
 private import abagames.tt.bulletimpl;
@@ -96,7 +97,8 @@ public class BarrageManager {
   static const string BARRAGE_DIR_NAME = "barrage";
 
   public static void load() {
-    string path = BARRAGE_DIR_NAME;
+    string path = assetStoragePath();
+    path ~= "/" ~ BARRAGE_DIR_NAME;
     foreach (string dirPath; dirEntries(path, SpanMode.shallow)) {
       if (!isDir(dirPath)) {
         continue;
@@ -110,9 +112,11 @@ public class BarrageManager {
   }
 
   public static bml.ResolvedBulletML getInstance(string dirName, string fileName) {
+    string path = assetStoragePath();
+    path ~= "/" ~ BARRAGE_DIR_NAME;
     string barrageName = dirName ~ "/" ~ fileName;
     Logger.info("Load BulletML: " ~ barrageName);
-    parser[dirName][fileName] = bml.resolve(bml.parse(BARRAGE_DIR_NAME ~ "/" ~ barrageName));
+    parser[dirName][fileName] = bml.resolve(bml.parse(path ~ "/" ~ barrageName));
     return parser[dirName][fileName];
   }
 

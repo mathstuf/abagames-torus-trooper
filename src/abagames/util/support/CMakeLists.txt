@@ -1,5 +1,11 @@
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/paths.d.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/paths.d"
+    @ONLY)
+
 set(util_support_srcs
-    gl.d)
+    gl.d
+    "${CMAKE_CURRENT_BINARY_DIR}/paths.d")
 
 add_library(tt_util_support STATIC
     ${util_support_srcs})
