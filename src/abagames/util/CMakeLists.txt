@@ -1,6 +1,5 @@
 set(util_srcs
     actor.d
-    iterator.d
     logger.d
     math.d
     prefmanager.d
