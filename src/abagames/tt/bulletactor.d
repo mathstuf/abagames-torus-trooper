@@ -60,6 +60,9 @@ public class BulletActor: Actor {
     ppos = vec2(0);
   }
 
+  public override void close() {
+  }
+
   public void set(bml.BulletMLRunner runner,
                   float x, float y, float deg, float speed) {
     bullet.set(runner, x, y, deg, speed, 0);

@@ -42,6 +42,9 @@ public class FloatLetter: Actor {
     pos = vec3(0);
   }
 
+  public override void close() {
+  }
+
   public void set(string m, vec2 p, float s, int c = 120) {
     pos = vec3(p, 1);
     mx = rand.nextSignedFloat(0.001);

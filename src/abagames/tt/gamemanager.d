@@ -147,7 +147,14 @@ public class GameManager: abagames.util.sdl.gamemanager.GameManager {
     stageManager.close();
     titleState.close();
     ship.close();
-    Shot.close();
+    particles.close();
+    shots.close();
+    bullets.close();
+    enemies.close();
+    particles.close();
+    floatLetters.close();
+    passedEnemies.close();
+    Shot.close_();
     Letter.close();
   }
 

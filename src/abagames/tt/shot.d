@@ -68,7 +68,7 @@ public class Shot: Actor {
     rand.setSeed(seed);
   }
 
-  public static void close() {
+  public static void close_() {
     shotShape.close();
   }
 
@@ -81,6 +81,9 @@ public class Shot: Actor {
     ship = cast(Ship) args[5];
     pos = vec2(0);
     shape = new ResizableDrawable;
+  }
+
+  public override void close() {
   }
 
   public void set(bool charge = false, bool star = false, float d = 0) {

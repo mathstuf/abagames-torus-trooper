@@ -77,6 +77,9 @@ public class Enemy: Actor {
     bitOffset = vec2(0);
   }
 
+  public override void close() {
+  }
+
   public void setPassedEnemies(EnemyPool pe) {
     passedEnemies = pe;
   }

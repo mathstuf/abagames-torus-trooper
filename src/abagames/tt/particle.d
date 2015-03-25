@@ -50,6 +50,9 @@ public class Particle: LuminousActor {
     rand.setSeed(seed);
   }
 
+  public override void close() {
+  }
+
   public override void init(Object[] args) {
     tunnel = cast(Tunnel) args[0];
     ship = cast(Ship) args[1];
