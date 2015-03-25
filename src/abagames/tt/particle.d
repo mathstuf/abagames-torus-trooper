@@ -11,6 +11,7 @@ private import abagames.util.support.gl;
 private import gl3n.linalg;
 private import abagames.util.rand;
 private import abagames.util.sdl.luminous;
+private import abagames.util.sdl.shaderprogram;
 private import abagames.tt.tunnel;
 private import abagames.tt.ship;
 private import abagames.tt.screen;
@@ -27,6 +28,13 @@ public class Particle: LuminousActor {
   static const float GRAVITY = 0.02;
   static const float SIZE = 0.3;
   static Rand rand;
+  static ShaderProgram sparkProgram;
+  static GLuint sparkVao;
+  static ShaderProgram starProgram;
+  static GLuint starVao;
+  static ShaderProgram fragmentProgram;
+  static GLuint fragmentVao;
+  static GLuint vbo;
   Tunnel tunnel;
   Ship ship;
   vec3 pos;
@@ -51,6 +59,18 @@ public class Particle: LuminousActor {
   }
 
   public override void close() {
+    if (sparkProgram !is null) {
+      glDeleteVertexArrays(1, &sparkVao);
+      glDeleteVertexArrays(1, &starVao);
+      glDeleteVertexArrays(1, &fragmentVao);
+      glDeleteBuffers(1, &vbo);
+      sparkProgram.close();
+      starProgram.close();
+      fragmentProgram.close();
+      sparkProgram = null;
+      starProgram = null;
+      fragmentProgram = null;
+    }
   }
 
   public override void init(Object[] args) {
@@ -63,6 +83,144 @@ public class Particle: LuminousActor {
     rsp = vec3(0);
     rpsp = vec3(0);
     icp = vec2(0);
+
+    if (sparkProgram !is null) {
+      return;
+    }
+
+    glGenBuffers(1, &vbo);
+
+    static const float[] BUF = [
+      /*
+      alphaFactor, offset,       factor,    padding */
+      1,            0,     0,     1, 0,  1, 0, 0,
+      0,           -SIZE, -SIZE, -1, 0,  1, 0, 0,
+      0,            SIZE, -SIZE, -1, 0, -1, 0, 0,
+      0,            SIZE,  SIZE,  1, 0, -1, 0, 0,
+      0,           -SIZE, +SIZE,  0, 0,  0, 0, 0,
+      0,           -SIZE, -SIZE,  0, 0,  0, 0, 0
+    ];
+    enum ALPHAFACTOR = 0;
+    enum OFFSET = 1;
+    enum FACTOR = 3;
+    enum BUFSZ = 8;
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, BUF.length * float.sizeof, BUF.ptr, GL_STATIC_DRAW);
+
+    sparkProgram = new ShaderProgram;
+    sparkProgram.setVertexShader(
+      "uniform mat4 projmat;\n"
+      "uniform vec3 prevpos;\n"
+      "uniform vec3 curpos;\n"
+      "\n"
+      "attribute float alphaFactor;\n"
+      "attribute vec2 offset;\n"
+      "\n"
+      "varying float f_alphaFactor;\n"
+      "\n"
+      "void main() {\n"
+      "  vec3 pos = (alphaFactor > 0.) ? prevpos : curpos;\n"
+      "  gl_Position = projmat * vec4(pos + vec3(offset, 0.), 1);\n"
+      "  f_alphaFactor = alphaFactor;\n"
+      "}\n"
+    );
+    sparkProgram.setFragmentShader(
+      "uniform vec3 color;\n"
+      "uniform float brightness;\n"
+      "uniform float alpha;\n"
+      "\n"
+      "varying float f_alphaFactor;\n"
+      "\n"
+      "void main() {\n"
+      "  gl_FragColor = vec4(color * brightness, alpha * f_alphaFactor);\n"
+      "}\n"
+    );
+    GLint alphaFactorLoc = 0;
+    GLint offsetLoc = 1;
+    sparkProgram.bindAttribLocation(alphaFactorLoc, "alphaFactor");
+    sparkProgram.bindAttribLocation(offsetLoc, "offset");
+    sparkProgram.link();
+    sparkProgram.use();
+
+    glGenVertexArrays(1, &sparkVao);
+    glBindVertexArray(sparkVao);
+
+    vertexAttribPointer(alphaFactorLoc, 1, BUFSZ, ALPHAFACTOR);
+    glEnableVertexAttribArray(alphaFactorLoc);
+
+    vertexAttribPointer(offsetLoc, 2, BUFSZ, OFFSET);
+    glEnableVertexAttribArray(offsetLoc);
+
+    starProgram = new ShaderProgram;
+    starProgram.setVertexShader(
+      "uniform mat4 projmat;\n"
+      "uniform vec3 prevpos;\n"
+      "uniform vec3 curpos;\n"
+      "\n"
+      "attribute float alphaFactor;\n"
+      "\n"
+      "varying float f_alphaFactor;\n"
+      "\n"
+      "void main() {\n"
+      "  vec3 pos = (alphaFactor > 0.) ? prevpos : curpos;\n"
+      "  gl_Position = projmat * vec4(pos, 1);\n"
+      "  f_alphaFactor = alphaFactor;\n"
+      "}\n"
+    );
+    starProgram.setFragmentShader(
+      "uniform vec3 color;\n"
+      "uniform float brightness;\n"
+      "\n"
+      "varying float f_alphaFactor;\n"
+      "\n"
+      "void main() {\n"
+      "  gl_FragColor = vec4(color * brightness, (f_alphaFactor > 0.) ? 1. : 0.2);\n"
+      "}\n"
+    );
+    starProgram.bindAttribLocation(alphaFactorLoc, "alphaFactor");
+    starProgram.link();
+    starProgram.use();
+
+    glGenVertexArrays(1, &starVao);
+    glBindVertexArray(starVao);
+
+    vertexAttribPointer(alphaFactorLoc, 1, BUFSZ, ALPHAFACTOR);
+    glEnableVertexAttribArray(alphaFactorLoc);
+
+    fragmentProgram = new ShaderProgram;
+    fragmentProgram.setVertexShader(
+      "uniform mat4 projmat;\n"
+      "uniform mat4 modelmat;\n"
+      "uniform vec3 size;\n"
+      "\n"
+      "attribute vec3 factor;\n"
+      "\n"
+      "void main() {\n"
+      "  gl_Position = projmat * modelmat * vec4(factor * size, 1);\n"
+      "}\n"
+    );
+    fragmentProgram.setFragmentShader(
+      "uniform vec3 color;\n"
+      "uniform float brightness;\n"
+      "uniform float alpha;\n"
+      "\n"
+      "void main() {\n"
+      "  gl_FragColor = vec4(color * brightness, alpha);\n"
+      "}\n"
+    );
+    GLint factorLoc = 0;
+    fragmentProgram.bindAttribLocation(factorLoc, "factorLoc");
+    fragmentProgram.link();
+    fragmentProgram.use();
+
+    glGenVertexArrays(1, &fragmentVao);
+    glBindVertexArray(fragmentVao);
+
+    vertexAttribPointer(factorLoc, 2, BUFSZ, FACTOR);
+    glEnableVertexAttribArray(factorLoc);
+
+    fragmentProgram.clear();
   }
 
   public void set(vec2 p, float z, float d, float mz, float speed,
@@ -175,37 +333,46 @@ public class Particle: LuminousActor {
   }
 
   private void drawSpark(mat4 view) {
-    glBegin(GL_TRIANGLE_FAN);
-    Screen.setColor(r, g, b, 0.5);
-    Screen.glVertex(psp);
-    Screen.setColor(r, g, b, 0);
-    glVertex3f(sp.x - SIZE, sp.y - SIZE, sp.z);
-    glVertex3f(sp.x + SIZE, sp.y - SIZE, sp.z);
-    glVertex3f(sp.x + SIZE, sp.y + SIZE, sp.z);
-    glVertex3f(sp.x - SIZE, sp.y + SIZE, sp.z);
-    glVertex3f(sp.x - SIZE, sp.y - SIZE, sp.z);
-    glEnd();
+    sparkProgram.use();
+
+    sparkProgram.setUniform("projmat", view);
+    sparkProgram.setUniform("brightness", Screen.brightness);
+    sparkProgram.setUniform("color", r, g, b);
+
+    sparkProgram.setUniform("alpha", 0.5);
+    sparkProgram.setUniform("prevpos", psp);
+    sparkProgram.setUniform("curpos", sp);
+
+    sparkProgram.useVao(sparkVao);
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+
     if (inCourse) {
-      glBegin(GL_TRIANGLE_FAN);
-      Screen.setColor(r, g, b, 0.2);
-      Screen.glVertex(rpsp);
-      Screen.setColor(r, g, b, 0);
-      glVertex3f(rsp.x - SIZE, rsp.y - SIZE, sp.z);
-      glVertex3f(rsp.x + SIZE, rsp.y - SIZE, sp.z);
-      glVertex3f(rsp.x + SIZE, rsp.y + SIZE, sp.z);
-      glVertex3f(rsp.x - SIZE, rsp.y + SIZE, sp.z);
-      glVertex3f(rsp.x - SIZE, rsp.y - SIZE, sp.z);
-      glEnd();
+      sparkProgram.setUniform("alpha", 0.2);
+      sparkProgram.setUniform("prevpos", rpsp);
+      sparkProgram.setUniform("curpos", rsp);
+
+      glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
     }
+
+    sparkProgram.clear();
   }
 
   private void drawStar(mat4 view) {
-    glBegin(GL_LINES);
-    Screen.setColor(r, g, b, 1);
-    Screen.glVertex(psp);
-    Screen.setColor(r, g, b, 0.2);
-    Screen.glVertex(sp);
-    glEnd();
+    starProgram.use();
+
+    starProgram.setUniform("projmat", view);
+    starProgram.setUniform("brightness", Screen.brightness);
+    starProgram.setUniform("color", r, g, b);
+
+    starProgram.setUniform("prevpos", psp);
+    starProgram.setUniform("curpos", sp);
+
+    starProgram.useVao(starVao);
+
+    glDrawArrays(GL_LINES, 0, 2);
+
+    starProgram.clear();
   }
 
   private void drawFragment(mat4 view) {
@@ -214,39 +381,42 @@ public class Particle: LuminousActor {
     model.rotate(-d1 / 180 * PI, vec3(0, 0, 1));
     model.translate(sp.x, sp.y, sp.z);
 
-    glPushMatrix();
-    glTranslatef(sp.x, sp.y, sp.z);
-    glRotatef(d1, 0, 0, 1);
-    glRotatef(d2, 0, 1, 0);
-    glBegin(GL_LINE_LOOP);
-    Screen.setColor(r, g, b, 0.5);
-    glVertex3f(width, 0, height);
-    glVertex3f(-width, 0, height);
-    glVertex3f(-width, 0, -height);
-    glVertex3f(width, 0, -height);
-    glEnd();
-    glBegin(GL_TRIANGLE_FAN);
-    Screen.setColor(r, g, b, 0.2);
-    glVertex3f(width, 0, height);
-    glVertex3f(-width, 0, height);
-    glVertex3f(-width, 0, -height);
-    glVertex3f(width, 0, -height);
-    glEnd();
-    glPopMatrix();
+    fragmentProgram.use();
+
+    fragmentProgram.setUniform("projmat", view);
+    fragmentProgram.setUniform("modelmat", model);
+    fragmentProgram.setUniform("brightness", Screen.brightness);
+    fragmentProgram.setUniform("color", r, g, b);
+    fragmentProgram.setUniform("size", width, 0, height);
+
+    fragmentProgram.useVao(fragmentVao);
+
+    fragmentProgram.setUniform("alpha", 0.5);
+    glDrawArrays(GL_LINE_LOOP, 0, 4);
+
+    fragmentProgram.setUniform("alpha", 0.2);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    fragmentProgram.clear();
   }
 
   public override void drawLuminous(mat4 view) {
     if (lumAlp < 0.2 || type != PType.SPARK) return;
-    glBegin(GL_TRIANGLE_FAN);
-    Screen.setColor(r, g, b, lumAlp * 0.6);
-    Screen.glVertex(psp);
-    Screen.setColor(r, g, b, 0);
-    glVertex3f(sp.x - SIZE, sp.y - SIZE, sp.z);
-    glVertex3f(sp.x + SIZE, sp.y - SIZE, sp.z);
-    glVertex3f(sp.x + SIZE, sp.y + SIZE, sp.z);
-    glVertex3f(sp.x - SIZE, sp.y + SIZE, sp.z);
-    glVertex3f(sp.x - SIZE, sp.y - SIZE, sp.z);
-    glEnd();
+    sparkProgram.use();
+
+    sparkProgram.setUniform("projmat", view);
+    sparkProgram.setUniform("brightness", Screen.brightness);
+    sparkProgram.setUniform("color", r, g, b);
+
+    sparkProgram.setUniform("alpha", lumAlp * 0.6);
+    sparkProgram.setUniform("prevpos", psp);
+    sparkProgram.setUniform("curpos", sp);
+
+    sparkProgram.useVao(sparkVao);
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+
+    sparkProgram.clear();
   }
 }
 
