@@ -98,6 +98,11 @@ public class ShaderProgram {
     }
   }
 
+  public void clear() {
+    glUseProgram(0);
+    lastProgram = 0;
+  }
+
   public void use() {
     if (lastProgram == program) {
       return;
