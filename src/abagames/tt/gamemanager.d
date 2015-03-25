@@ -463,8 +463,8 @@ public class InGameState: GameState {
     else
       Letter.drawTime(view, time, 220, 24, 15, 1);
     if (timeChangedShowCnt >= 0 && (timeChangedShowCnt % 64) > 32)
-      Letter.drawString(view, timeChangedMsg, 250, 24, 7, Letter.Direction.TO_RIGHT, 1);
-    Letter.drawString(view, "LEVEL", 20, 410, 8, Letter.Direction.TO_RIGHT, 1);
+      Letter.drawString(view, timeChangedMsg, 250, 24, 7, Letter.Direction.TO_RIGHT, Letter.COLOR1);
+    Letter.drawString(view, "LEVEL", 20, 410, 8, Letter.Direction.TO_RIGHT, Letter.COLOR1);
     Letter.drawNum(view, cast(int) stageManager.level, 135, 410, 8);
     if (ship.isGameOver)
       Letter.drawString(view, "GAME OVER", 140, 180, 20);

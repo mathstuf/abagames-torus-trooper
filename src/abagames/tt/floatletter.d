@@ -72,9 +72,9 @@ public class FloatLetter: Actor {
     model.translate(0, 0, sp.z);
 
     Letter.setColor(vec4(1, 1, 1, 1));
-    Letter.drawString(view * model, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 2, false, d  * 180 / PI);
+    Letter.drawString(view * model, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, Letter.LINE_COLOR, false, d  * 180 / PI);
     Letter.setColor(vec4(1, 1, 1, alpha));
-    Letter.drawString(view * model, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 3, false, d  * 180 / PI);
+    Letter.drawString(view * model, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, Letter.POLY_COLOR, false, d  * 180 / PI);
   }
 }
 

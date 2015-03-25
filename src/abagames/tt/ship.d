@@ -597,11 +597,11 @@ public class Ship: BulletTarget {
     Letter.drawNum(view, rank, 150, 432, 16);
     Letter.drawString(view, "/", 185, 448, 10);
     Letter.drawNum(view, zoneEndRank - rank, 250, 448, 10);
-    /*Letter.drawString(view, "LAP", 20, 388, 8, Letter.Direction.TO_RIGHT, 1);
+    /*Letter.drawString(view, "LAP", 20, 388, 8, Letter.Direction.TO_RIGHT, Letter.COLOR1);
     Letter.drawNum(view, lap, 120, 388, 8);
     Letter.drawString(view, ".", 130, 386, 8);
     Letter.drawNum(view, cast(int) (pos.y * 1000000 / tunnel.getTorusLength()), 230, 388, 8,
-                   Letter.Direction.TO_RIGHT, 0, 6);*/
+                   Letter.Direction.TO_RIGHT, Letter.COLOR0, 6);*/
   }
 
   public vec2 pos() {

@@ -18,6 +18,10 @@ public class Letter {
  public:
   static const float LETTER_WIDTH = 2.1f;
   static const float LETTER_HEIGHT = 3.0f;
+  static const int COLOR0 = 0;
+  static const int COLOR1 = 1;
+  static const int LINE_COLOR = 2;
+  static const int POLY_COLOR = 3;
   static const int COLOR_NUM = 4;
  private:
   static const float[][] COLOR_RGB = [[1, 1, 1], [0.9, 0.7, 0.5]];
@@ -156,7 +160,7 @@ public class Letter {
   }
 
   public static void drawString(mat4 view, string str, float lx, float y, float s,
-                                int d = Direction.TO_RIGHT, int cl = 0,
+                                int d = Direction.TO_RIGHT, int cl = Letter.COLOR0,
                                 bool rev = false, float od = 0) {
     lx += LETTER_WIDTH * s / 2;
     y += LETTER_HEIGHT * s / 2;
@@ -213,7 +217,7 @@ public class Letter {
   }
 
   public static void drawNum(mat4 view, int num, float lx, float y, float s,
-                             int d = Direction.TO_RIGHT, int cl = 0, int dg = 0) {
+                             int d = Direction.TO_RIGHT, int cl = Letter.COLOR0, int dg = 0) {
     lx += LETTER_WIDTH * s / 2;
     y += LETTER_HEIGHT * s / 2;
     int n = num;
@@ -283,7 +287,7 @@ public class Letter {
     }
   }
 
-  public static void drawTime(mat4 view, int time, float lx, float y, float s, int cl = 0) {
+  public static void drawTime(mat4 view, int time, float lx, float y, float s, int cl = Letter.COLOR0) {
     int n = time;
     if (n < 0)
       n = 0;
