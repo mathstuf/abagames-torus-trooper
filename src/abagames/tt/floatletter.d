@@ -71,13 +71,10 @@ public class FloatLetter: Actor {
     mat4 model = mat4.identity;
     model.translate(0, 0, sp.z);
 
-    glPushMatrix();
-    glTranslatef(0, 0, sp.z);
-    Screen.setColor(1, 1, 1, 1);
-    Letter.drawString(view, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 2, false, d  * 180 / PI);
-    Screen.setColor(1, 1, 1, alpha);
-    Letter.drawString(view, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 3, false, d  * 180 / PI);
-    glPopMatrix();
+    Letter.setColor(vec4(1, 1, 1, 1));
+    Letter.drawString(view * model, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 2, false, d  * 180 / PI);
+    Letter.setColor(vec4(1, 1, 1, alpha));
+    Letter.drawString(view * model, msg, sp.x, sp.y, size, Letter.Direction.TO_RIGHT, 3, false, d  * 180 / PI);
   }
 }
 

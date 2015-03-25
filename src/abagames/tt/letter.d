@@ -8,7 +8,7 @@ module abagames.tt.letter;
 private import std.math;
 private import gl3n.linalg;
 private import abagames.util.support.gl;
-private import abagames.util.sdl.displaylist;
+private import abagames.util.sdl.shaderprogram;
 private import abagames.tt.screen;
 
 /**
@@ -16,29 +16,73 @@ private import abagames.tt.screen;
  */
 public class Letter {
  public:
-  static DisplayList displayList;
   static const float LETTER_WIDTH = 2.1f;
   static const float LETTER_HEIGHT = 3.0f;
   static const int COLOR_NUM = 4;
  private:
   static const float[][] COLOR_RGB = [[1, 1, 1], [0.9, 0.7, 0.5]];
-  static const int LETTER_NUM = 44;
-  static const int DISPLAY_LIST_NUM = LETTER_NUM * COLOR_NUM;
+  static ShaderProgram program;
+  static GLuint vao;
+  static GLuint vbo;
 
   public static void init() {
-    displayList = new DisplayList(DISPLAY_LIST_NUM);
-    displayList.resetList();
-    for (int j = 0; j < COLOR_NUM; j++) {
-      for (int i = 0; i < LETTER_NUM; i++) {
-        displayList.newList();
-        drawLetter(mat4.identity, i, j);
-        displayList.endList();
-      }
-    }
+    program = new ShaderProgram;
+    program.setVertexShader(
+      "uniform mat4 projmat;\n"
+      "uniform mat4 boxmat;\n"
+      "uniform mat4 drawmat;\n"
+      "uniform vec2 size;\n"
+      "\n"
+      "attribute vec2 pos;\n"
+      "\n"
+      "void main() {\n"
+      "  gl_Position = projmat * drawmat * boxmat * vec4(pos * size, 0, 1);\n"
+      "}\n"
+    );
+    program.setFragmentShader(
+      "uniform vec4 color;\n"
+      "uniform float brightness;\n"
+      "\n"
+      "void main() {\n"
+      "  gl_FragColor = color * vec4(vec3(brightness), 1);\n"
+      "}\n"
+    );
+    GLint posLoc = 0;
+    program.bindAttribLocation(posLoc, "pos");
+    program.link();
+    program.use();
+
+    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &vao);
+
+    static const float[] BUF = [
+      /*
+      pos */
+      -0.5f,   0,
+      -0.33f, -0.5f,
+       0.33f, -0.5f,
+       0.5f,   0,
+       0.33f,  0.5f,
+      -0.33f,  0.5f
+    ];
+    enum POS = 0;
+    enum BUFSZ = 2;
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, BUF.length * float.sizeof, BUF.ptr, GL_STATIC_DRAW);
+
+    glBindVertexArray(vao);
+
+    vertexAttribPointer(posLoc, 2, BUFSZ, POS);
+    glEnableVertexAttribArray(posLoc);
+
+    program.clear();
   }
 
   public static void close() {
-    displayList.close();
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    program.close();
   }
 
   public static float getWidth(int n ,float s) {
@@ -47,6 +91,14 @@ public class Letter {
 
   public static float getHeight(float s) {
     return s * LETTER_HEIGHT;
+  }
+
+  public static void setColor(vec4 color) {
+    program.use();
+
+    program.setUniform("color", color);
+
+    program.clear();
   }
 
   private static void drawLetter(mat4 view, int n, float x, float y, float s, float d, int c) {
@@ -58,17 +110,21 @@ public class Letter {
   }
 
   private static void drawLetter(mat4 view, int n, float x, float y, float s, int f, float d, int c) {
-    mat4 model = mat4.identity;
-    model.rotate(-d / 180 * PI, vec3(0, 0, 1));
-    model.scale(s, s * f, s);
-    model.translate(x, y, 0);
+    program.use();
 
-    glPushMatrix();
-    glTranslatef(x, y, 0);
-    glScalef(s, s * f, s);
-    glRotatef(d, 0, 0, 1);
-    displayList.call(n + c * LETTER_NUM);
-    glPopMatrix();
+    program.setUniform("projmat", view);
+    program.setUniform("brightness", Screen.brightness);
+
+    mat4 draw = mat4.identity;
+    draw.rotate(-d / 180 * PI, vec3(0, 0, 1));
+    draw.scale(s, s * f, s);
+    draw.translate(x, y, 0);
+    program.setUniform("drawmat", draw);
+
+    program.useVao(vao);
+    drawLetter(n, c);
+
+    program.clear();
   }
 
   public static enum Direction {
@@ -260,7 +316,7 @@ public class Letter {
     }
   }
 
-  private static void drawLetter(mat4 view, int idx, int c) {
+  private static void drawLetter(int idx, int c) {
     float x, y, length, size, t;
     float deg;
     for (int i = 0;; i++) {
@@ -277,72 +333,50 @@ public class Letter {
       y = y;
       deg %= 180;
       if (c == 2)
-        drawBoxLine(view, x, y, size, length, deg);
+        drawBoxLine(x, y, size, length, deg);
       else if (c == 3)
-        drawBoxPoly(view, x, y, size, length, deg);
+        drawBoxPoly(x, y, size, length, deg);
       else
-        drawBox(view, x, y, size, length, deg,
+        drawBox(x, y, size, length, deg,
                 COLOR_RGB[c][0], COLOR_RGB[c][1], COLOR_RGB[c][2]);
     }
   }
 
-  private static void drawBox(mat4 view, float x, float y, float width, float height, float deg,
+  private static void drawBox(float x, float y, float width, float height, float deg,
                               float r, float g, float b) {
-    mat4 model = drawBoxMat(x, y, width, height, deg);
+    drawBoxMat(x, y, width, height, deg);
 
-    glPushMatrix();
-    glTranslatef(x - width / 2, y - height / 2, 0);
-    glRotatef(deg, 0, 0, 1);
-    Screen.setColor(r, g, b, 0.5);
-    glBegin(GL_TRIANGLE_FAN);
-    drawBoxPart(view, width, height);
-    glEnd();
-    Screen.setColor(r, g, b);
-    glBegin(GL_LINE_LOOP);
-    drawBoxPart(view, width, height);
-    glEnd();
-    glPopMatrix();
+    program.setUniform("color", r, g, b, 0.5);
+    drawBoxPart(GL_TRIANGLE_FAN, width, height);
+
+    program.setUniform("color", r, g, b, 1);
+    drawBoxPart(GL_LINE_LOOP, width, height);
   }
 
-  private static void drawBoxLine(mat4 view, float x, float y, float width, float height, float deg) {
-    mat4 model = drawBoxMat(x, y, width, height, deg);
+  private static void drawBoxLine(float x, float y, float width, float height, float deg) {
+    drawBoxMat(x, y, width, height, deg);
 
-    glPushMatrix();
-    glTranslatef(x - width / 2, y - height / 2, 0);
-    glRotatef(deg, 0, 0, 1);
-    glBegin(GL_LINE_LOOP);
-    drawBoxPart(view, width, height);
-    glEnd();
-    glPopMatrix();
+    drawBoxPart(GL_LINE_LOOP, width, height);
   }
 
-  private static void drawBoxPoly(mat4 view, float x, float y, float width, float height, float deg) {
-    mat4 model = drawBoxMat(x, y, width, height, deg);
+  private static void drawBoxPoly(float x, float y, float width, float height, float deg) {
+    drawBoxMat(x, y, width, height, deg);
 
-    glPushMatrix();
-    glTranslatef(x - width / 2, y - height / 2, 0);
-    glRotatef(deg, 0, 0, 1);
-    glBegin(GL_TRIANGLE_FAN);
-    drawBoxPart(view, width, height);
-    glEnd();
-    glPopMatrix();
+    drawBoxPart(GL_TRIANGLE_FAN, width, height);
   }
 
-  private static mat4 drawBoxMat(float x, float y, float width, float height, float deg) {
-    mat4 model = mat4.identity;
-    model.rotate(-deg / 180 * PI, vec3(0, 0, 1));
-    model.translate(x - width / 2, y - height / 2, 0);
+  private static void drawBoxMat(float x, float y, float width, float height, float deg) {
+    mat4 box = mat4.identity;
+    box.rotate(-deg / 180 * PI, vec3(0, 0, 1));
+    box.translate(x - width / 2, y - height / 2, 0);
 
-    return model;
+    program.setUniform("boxmat", box);
   }
 
-  private static void drawBoxPart(mat4 view, float width, float height) {
-    glVertex3f(-width / 2, 0, 0);
-    glVertex3f(-width / 3 * 1, -height / 2, 0);
-    glVertex3f( width / 3 * 1, -height / 2, 0);
-    glVertex3f( width / 2, 0, 0);
-    glVertex3f( width / 3 * 1,  height / 2, 0);
-    glVertex3f(-width / 3 * 1,  height / 2, 0);
+  private static void drawBoxPart(GLenum type, float width, float height) {
+    program.setUniform("size", width, height);
+
+    glDrawArrays(type, 0, 6);
   }
 
   private static float[5][16][] spData =
