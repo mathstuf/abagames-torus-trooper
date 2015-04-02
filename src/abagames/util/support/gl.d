@@ -5,6 +5,10 @@
  */
 module abagames.util.support.gl;
 
+private import gl3n.linalg;
+private import std.stdio;
+private import std.conv;
+
 version (Android) {
   private import derelict.gles.egl;
   public import derelict.gles.gles2;
@@ -54,4 +58,17 @@ version (Android) {
 
 public void vertexAttribPointer(GLuint index, GLint size, GLsizei stride, GLsizei offset) {
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, cast(GLsizei)(stride * float.sizeof), cast(const(void*))(offset * float.sizeof));
+}
+
+public void checkMatrix(mat4 mat) {
+  mat4 glm;
+  mat4 glp;
+
+  glGetFloatv(GL_MODELVIEW_MATRIX, glm.matrix[0].ptr);
+  glGetFloatv(GL_PROJECTION_MATRIX, glp.matrix[0].ptr);
+  glm.transpose;
+  glp.transpose;
+
+  writeln("gl : " ~ to!string(glp * glm));
+  writeln("mat: " ~ to!string(mat));
 }
