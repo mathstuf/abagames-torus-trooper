@@ -106,18 +106,14 @@ public class BarrageManager {
       string dirName = baseName(dirPath);
       foreach (string filePath; dirEntries(dirPath, "*.xml", SpanMode.shallow)) {
         string fileName = baseName(filePath);
-        parser[dirName][fileName] = getInstance(dirName, fileName);
+        parser[dirName][fileName] = getInstance(filePath);
       }
     }
   }
 
-  public static bml.ResolvedBulletML getInstance(string dirName, string fileName) {
-    string path = assetStoragePath();
-    path ~= "/" ~ BARRAGE_DIR_NAME;
-    string barrageName = dirName ~ "/" ~ fileName;
-    Logger.info("Load BulletML: " ~ barrageName);
-    parser[dirName][fileName] = bml.resolve(bml.parse(path ~ "/" ~ barrageName));
-    return parser[dirName][fileName];
+  public static bml.ResolvedBulletML getInstance(string path) {
+    Logger.info("Load BulletML: " ~ path);
+    return bml.resolve(bml.parse(path));
   }
 
   public static bml.ResolvedBulletML[] getInstanceList(string dirName) {
