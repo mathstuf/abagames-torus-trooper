@@ -32,7 +32,7 @@ public class ActorPool(T) {
  public:
   T[] actor;
  protected:
-  long actorIdx = 0;
+  size_t actorIdx = 0;
  private:
 
   public this() {}
@@ -53,9 +53,7 @@ public class ActorPool(T) {
 
   public T getInstance() {
     for (int i = 0; i < actor.length; i++) {
-      actorIdx--;
-      if (actorIdx < 0)
-        actorIdx = actor.length - 1;
+      nextActor();
       if (!actor[actorIdx].exists)
         return actor[actorIdx];
     }
@@ -63,9 +61,7 @@ public class ActorPool(T) {
   }
 
   public T getInstanceForced() {
-    actorIdx--;
-    if (actorIdx < 0)
-      actorIdx = actor.length - 1;
+    nextActor();
     return actor[actorIdx];
   }
 
@@ -102,5 +98,12 @@ public class ActorPool(T) {
     foreach (T ac; actor)
       ac.exists = false;
     actorIdx = 0;
+  }
+
+  private void nextActor() {
+    if (actorIdx == 0)
+      actorIdx = actor.length - 1;
+    else
+      actorIdx--;
   }
 }
